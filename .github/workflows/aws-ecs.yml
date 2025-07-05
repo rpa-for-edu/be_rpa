@@ -95,7 +95,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/be_rpa_app
+  IMAGE_NAME: ghcr.io/chiencse/be_rpa_app:latest
 
 permissions:
   contents: write
