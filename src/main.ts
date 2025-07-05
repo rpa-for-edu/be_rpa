@@ -19,7 +19,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .addOAuth2()
-    .addApiKey({type: 'apiKey', name: 'Service-Key', in: 'header'}, 'Service-Key')
+    .addApiKey({ type: 'apiKey', name: 'Service-Key', in: 'header' }, 'Service-Key')
     .build();
   const document = SwaggerModule.createDocument(app, config, {
     extraModels: [ActivityPackage, DocumentTemplateDetail, ProcessDetail],
@@ -32,6 +32,6 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(8080);
+  await app.listen(process.env.PORT || 4001);
 }
 bootstrap();
