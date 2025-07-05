@@ -137,7 +137,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: '.env,docker-compose-staging.yml'
-          target: /home/${{ secrets.EC2_USER }}/book3d
+          target: /home/${{ secrets.EC2_USER }}/be_rpa_app
 
       - name: SSH and Deploy
         uses: appleboy/ssh-action@v1.0.0
