@@ -10,8 +10,6 @@ services:
       - 4001:4001
     networks:
       - rpa
-    volumes:
-      - .env:/app/env/.env
 
 volumes:
   db_data:
