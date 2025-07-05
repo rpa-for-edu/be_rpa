@@ -78,7 +78,6 @@ export class RobotRunOverall {
 
   @CreateDateColumn({
     type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
     name: 'created_date',
   })
   createdDate: Date;

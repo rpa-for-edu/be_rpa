@@ -1,4 +1,12 @@
-import { Entity, Column, ManyToOne, PrimaryColumn, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  PrimaryColumn,
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 import { User } from 'src/users/entity/user.entity';
 import { Process } from 'src/processes/entity/process.entity';
 
@@ -16,6 +24,9 @@ export class Robot {
     nullable: false,
   })
   name: string;
+
+  @PrimaryGeneratedColumn()
+  id: string;
 
   @PrimaryColumn()
   userId: number;
@@ -44,7 +55,8 @@ export class Robot {
 
   @Column({
     nullable: false,
-    name: "robot_key"
+    name: 'robot_key',
+    unique: true,
   })
   robotKey: string;
 }

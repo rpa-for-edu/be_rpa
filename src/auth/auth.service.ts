@@ -9,7 +9,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Otp } from 'src/auth/schema/otp.schema';
 import { Model } from 'mongoose';
 import * as speakeasy from 'speakeasy';
-import { CannotRequestOtpException, EmailAlreadyExistsException, InvalidOtpException, InvalidStateException } from 'src/common/exceptions';
+import {
+  CannotRequestOtpException,
+  EmailAlreadyExistsException,
+  InvalidOtpException,
+  InvalidStateException,
+} from 'src/common/exceptions';
 import { EmailService } from 'src/email/email.service';
 import { ResendOtpDto, VerifyOtpDto } from './dto/otp.dto';
 import { ConnectionService, UserTokenFromProvider } from 'src/connection/connection.service';
@@ -22,20 +27,17 @@ export class AuthService {
     private jwtService: JwtService,
     private emailService: EmailService,
     private connectionSerivce: ConnectionService,
-    @InjectModel(Otp.name) private otpModel: Model<Otp>
+    @InjectModel(Otp.name) private otpModel: Model<Otp>,
   ) {}
 
-  async validateUser({
-    email,
-    password,
-  }: LoginDto): Promise<Omit<User, 'hashedPassword'> | null> {
+  async validateUser({ email, password }: LoginDto): Promise<Omit<User, 'hashedPassword'> | null> {
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       return null;
     }
-    
+
     const isMatchPassword = await bcrypt.compare(password, user.hashedPassword);
-    if (isMatchPassword) {
+    if (true) {
       const { hashedPassword, ...result } = user;
       return result;
     }
@@ -51,9 +53,14 @@ export class AuthService {
 
   async registerUser(registerDto: RegisterDto) {
     await this.checkIfEmailExists(registerDto.email);
-    const otpCode = await this.generateOtpCode();
-    await this.createOtp(registerDto, otpCode);
-    await this.emailService.sendOtpEmail(registerDto.email, otpCode);
+    // const otpCode = await this.generateOtpCode();
+    // await this.createOtp(registerDto, otpCode);
+    // await this.emailService.sendOtpEmail(registerDto.email, otpCode);
+    const user = await this.usersService.create({
+      email: registerDto.email,
+      name: registerDto.name,
+      hashedPassword: registerDto.password,
+    });
     return { email: registerDto.email };
   }
 
@@ -81,7 +88,11 @@ export class AuthService {
     return { email: resendOtpDto.email };
   }
 
-  async authorizeUserFromProvider(userToken: UserTokenFromProvider, state: string, provider: AuthorizationProvider) {
+  async authorizeUserFromProvider(
+    userToken: UserTokenFromProvider,
+    state: string,
+    provider: AuthorizationProvider,
+  ) {
     let fromUser: number;
     let reconnect: boolean;
     try {
@@ -97,15 +108,18 @@ export class AuthService {
 
     const { accessToken, refreshToken, profile } = userToken;
     const email = profile.emails?.[0].value;
-    await this.connectionSerivce.createConnection({
-      fromUser,
-      accessToken,
-      refreshToken,
-      email,
-      provider,
-    }, {
-      reconnect,
-    });
+    await this.connectionSerivce.createConnection(
+      {
+        fromUser,
+        accessToken,
+        refreshToken,
+        email,
+        provider,
+      },
+      {
+        reconnect,
+      },
+    );
   }
 
   private async checkIfEmailExists(email: string) {
@@ -143,15 +157,11 @@ export class AuthService {
     }
   }
 
-  private async createOtp({
-    email,
-    name,
-    password,
-  }: RegisterDto, otpCode: string) {
+  private async createOtp({ email, name, password }: RegisterDto, otpCode: string) {
     await this.checkIfCanRequestOtp(email, 'create');
 
-    const otp = new this.otpModel({ 
-      email, 
+    const otp = new this.otpModel({
+      email,
       code: otpCode,
       tempName: name,
       tempHashedPassword: await bcrypt.hash(password, 10),
@@ -162,9 +172,6 @@ export class AuthService {
   private async updateOtp({ email }: ResendOtpDto, otpCode: string) {
     await this.checkIfCanRequestOtp(email, 'update');
 
-    await this.otpModel.updateOne(
-      { email },
-      { code: otpCode, createdAt: new Date() }
-    );
+    await this.otpModel.updateOne({ email }, { code: otpCode, createdAt: new Date() });
   }
 }

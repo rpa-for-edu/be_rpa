@@ -47,7 +47,8 @@ export class Connection {
 
   @Column({
     nullable: false,
-    name: "connection_key"
+    name: 'connection_key',
+    unique: true,
   })
   connectionKey: string;
 }

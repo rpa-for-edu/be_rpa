@@ -28,7 +28,7 @@ export class LogService {
       nextToken: nextToken,
     };
 
-    try {
+    try { 
       const command = new DescribeLogGroupsCommand(params);
       const { logGroups, nextToken: newToken } = await this.cloudWatchLogsClient.send(command);
 

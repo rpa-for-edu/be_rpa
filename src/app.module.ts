@@ -45,6 +45,7 @@ const ENV_FILE_PATH =
         autoLoadEntities: true,
         migrations: [resolve(__dirname, 'migrations/*{.ts,.js}')],
         migrationsRun: false,
+        logging: true,
         synchronize: false, // WARNING: set to false on production! As it will drop all tables and re-create them if entities changed.
       }),
       inject: [ConfigService],
@@ -94,6 +95,9 @@ const ENV_FILE_PATH =
   providers: [AppService],
 })
 export class AppModule implements NestModule {
+  constructor(private readonly configService: ConfigService) {
+    // console.log('Current environment' + process.env.TZ);
+  }
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(RequestLoggerMiddleware).forRoutes('*');
   }
