@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 # Copy package files và cài dependency
 COPY package.json package-lock.json ./
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -22,7 +22,7 @@ WORKDIR /usr/src/app
 
 COPY package.json package-lock.json ./
 
-RUN npm install --only=production
+RUN npm install --legacy-peer-deps --only=production
 
 # Final stage
 FROM node:20-slim
