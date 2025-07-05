@@ -7,11 +7,9 @@ services:
     env_file:
       - .env
     ports:
-      - '${PORT}:${PORT}'
-    depends_on:
-      - db
+      - 4001:4001
     networks:
-      - backend
+      - rpa
     volumes:
       - .env:/app/env/.env
 
@@ -19,4 +17,4 @@ volumes:
   db_data:
 
 networks:
-  backend:
+  rpa:
