@@ -24,7 +24,7 @@ import { RobotReportModule } from './robot-report/robot-report.module';
 
 const ENV_FILE_PATH =
   process.env.NODE_ENV === 'production'
-    ? resolve(__dirname, '../../env/.env')
+    ? resolve(__dirname, '../../env/.env.production')
     : resolve(__dirname, '../../env/.env');
 
 @Module({

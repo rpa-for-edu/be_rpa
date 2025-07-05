@@ -22,7 +22,7 @@ WORKDIR /usr/src/app
 
 COPY package.json package-lock.json ./
 
-RUN npm install --legacy-peer-deps --only=production
+RUN npm install --legacy-peer-deps
 
 # Final stage
 FROM node:20-slim
