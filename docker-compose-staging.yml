@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    image: ghcr.io/${GHCR_USERNAME}/be_rpa_app:latest
+    container_name: be_rpa_app
+    env_file:
+      - .env
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      - db
+    networks:
+      - backend
+    volumes:
+      - .env:/app/env/.env
+
+volumes:
+  db_data:
+
+networks:
+  backend:

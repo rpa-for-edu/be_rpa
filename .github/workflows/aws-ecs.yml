@@ -1,88 +1,159 @@
-# This workflow will build and push a new container image to Amazon ECR,
-# and then will deploy a new task definition to Amazon ECS, when there is a push to the "master" branch.
-#
-# To use this workflow, you will need to complete the following set-up steps:
-#
-# 1. Create an ECR repository to store your images.
-#    For example: `aws ecr create-repository --repository-name my-ecr-repo --region us-east-2`.
-#    Replace the value of the `ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
-#    Replace the value of the `AWS_REGION` environment variable in the workflow below with your repository's region.
-#
-# 2. Create an ECS task definition, an ECS cluster, and an ECS service.
-#    For example, follow the Getting Started guide on the ECS console:
-#      https://us-east-2.console.aws.amazon.com/ecs/home?region=us-east-2#/firstRun
-#    Replace the value of the `ECS_SERVICE` environment variable in the workflow below with the name you set for the Amazon ECS service.
-#    Replace the value of the `ECS_CLUSTER` environment variable in the workflow below with the name you set for the cluster.
-#
-# 3. Store your ECS task definition as a JSON file in your repository.
-#    The format should follow the output of `aws ecs register-task-definition --generate-cli-skeleton`.
-#    Replace the value of the `ECS_TASK_DEFINITION` environment variable in the workflow below with the path to the JSON file.
-#    Replace the value of the `CONTAINER_NAME` environment variable in the workflow below with the name of the container
-#    in the `containerDefinitions` section of the task definition.
-#
-# 4. Store an IAM user access key in GitHub Actions secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
-#    See the documentation for each action used below for the recommended IAM policies for this IAM user,
-#    and best practices on handling the access key credentials.
+# # This workflow will build and push a new container image to Amazon ECR,
+# # and then will deploy a new task definition to Amazon ECS, when there is a push to the "master" branch.
+# #
+# # To use this workflow, you will need to complete the following set-up steps:
+# #
+# # 1. Create an ECR repository to store your images.
+# #    For example: `aws ecr create-repository --repository-name my-ecr-repo --region us-east-2`.
+# #    Replace the value of the `ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
+# #    Replace the value of the `AWS_REGION` environment variable in the workflow below with your repository's region.
+# #
+# # 2. Create an ECS task definition, an ECS cluster, and an ECS service.
+# #    For example, follow the Getting Started guide on the ECS console:
+# #      https://us-east-2.console.aws.amazon.com/ecs/home?region=us-east-2#/firstRun
+# #    Replace the value of the `ECS_SERVICE` environment variable in the workflow below with the name you set for the Amazon ECS service.
+# #    Replace the value of the `ECS_CLUSTER` environment variable in the workflow below with the name you set for the cluster.
+# #
+# # 3. Store your ECS task definition as a JSON file in your repository.
+# #    The format should follow the output of `aws ecs register-task-definition --generate-cli-skeleton`.
+# #    Replace the value of the `ECS_TASK_DEFINITION` environment variable in the workflow below with the path to the JSON file.
+# #    Replace the value of the `CONTAINER_NAME` environment variable in the workflow below with the name of the container
+# #    in the `containerDefinitions` section of the task definition.
+# #
+# # 4. Store an IAM user access key in GitHub Actions secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+# #    See the documentation for each action used below for the recommended IAM policies for this IAM user,
+# #    and best practices on handling the access key credentials.
 
-name: Deploy to Amazon ECS
+# name: Deploy to Amazon ECS
+
+# on:
+#   push:
+#     branches: [ "master" ]
+
+# env:
+#   AWS_REGION: ap-southeast-2                  # set this to your preferred AWS region, e.g. us-west-1
+#   ECR_REPOSITORY: edu-rpa-backend             # set this to your Amazon ECR repository name
+#   ECS_SERVICE: SERVICE-NAME                   # set this to your Amazon ECS service name
+#   ECS_CLUSTER: edu-rpa-cluster                # set this to your Amazon ECS cluster name
+#   ECS_TASK_DEFINITION: .aws/task-definition.json # set this to the path to your Amazon ECS task definition
+#                                                  # file, e.g. .aws/task-definition.json
+#   CONTAINER_NAME: backend                     # set this to the name of the container in the
+#                                               # containerDefinitions section of your task definition
+
+# permissions:
+#   id-token: write # This is required for requesting the JWT
+#   contents: read  # This is required for actions/checkout
+
+# jobs:
+#   deploy:
+#     name: Deploy
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@v3
+
+#     - name: Configure AWS credentials
+#       uses: aws-actions/configure-aws-credentials@v4
+#       with:
+#         role-to-assume: arn:aws:iam::678601387840:role/github_actions_ecs
+#         aws-region: ${{ env.AWS_REGION }}
+
+#     - name: Login to Amazon ECR
+#       id: login-ecr
+#       uses: aws-actions/amazon-ecr-login@v2
+
+#     - name: Build, tag, and push docker image to Amazon ECR
+#       id: build-image
+#       env:
+#         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#         IMAGE_TAG: ${{ github.sha }}
+#       run: |
+#           docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+#           docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+#           echo "image=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
+#     - name: Fill in the new image ID in the Amazon ECS task definition
+#       id: task-def
+#       uses: aws-actions/amazon-ecs-render-task-definition@v1
+#       with:
+#         task-definition: ${{ env.ECS_TASK_DEFINITION }}
+#         container-name: ${{ env.CONTAINER_NAME }}
+#         image: ${{ steps.build-image.outputs.image }}
+
+#     - name: Deploy Amazon ECS task definition
+#       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+#       with:
+#         task-definition: ${{ steps.task-def.outputs.task-definition }}
+#         cluster: ${{ env.ECS_CLUSTER }}
+
+name: 🚀 Deploy Fullstack App
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [main]
+  workflow_dispatch:
 
 env:
-  AWS_REGION: ap-southeast-2                  # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: edu-rpa-backend             # set this to your Amazon ECR repository name
-  ECS_SERVICE: SERVICE-NAME                   # set this to your Amazon ECS service name
-  ECS_CLUSTER: edu-rpa-cluster                # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: .aws/task-definition.json # set this to the path to your Amazon ECS task definition
-                                                 # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: backend                     # set this to the name of the container in the
-                                              # containerDefinitions section of your task definition
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/be_rpa_app
 
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout                   
+  contents: write
 
 jobs:
-  deploy:
-    name: Deploy
+  build:
+    name: Build Docker Image
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: arn:aws:iam::678601387840:role/github_actions_ecs
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Login to GitHub Container Registry (GHCR)
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+      - name: Build Docker Image
+        run: docker build -t $IMAGE_NAME:latest .
 
-    - name: Build, tag, and push docker image to Amazon ECR
-      id: build-image
-      env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-          docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+      - name: Push Docker Image
+        run: docker push $IMAGE_NAME:latest
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        cluster: ${{ env.ECS_CLUSTER }}
+      - name: Create .env File
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Copy Files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: '.env,docker-compose-staging.yml'
+          target: /home/${{ secrets.EC2_USER }}/book3d
+
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: GHCR_TOKEN,GHCR_USERNAME,IMAGE_NAME
+          script: |
+            cd /home/${{ secrets.EC2_USER }}/book3d
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+            docker compose -f docker-compose-staging.yml down
+            docker rmi $IMAGE_NAME:latest || true
+            docker compose -f docker-compose-staging.yml pull
+            docker compose -f docker-compose-staging.yml up -d
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}

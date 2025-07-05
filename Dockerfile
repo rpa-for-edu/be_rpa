@@ -1,23 +1,46 @@
-# Use Node.js v18 as the base image
-FROM node:18-alpine
+# Build stage
+FROM node:20-slim AS builder
 
-# Set the working directory to /app
-WORKDIR /app
+# Tạo thư mục app
+WORKDIR /usr/src/app
 
-# Copy the package.json and package-lock.json files to the container
-COPY package*.json ./
+# Copy package files và cài dependency
+COPY package.json package-lock.json ./
 
-# Install the dependencies
 RUN npm install
 
-# Copy the rest of the application code to the container
+# Copy source code
 COPY . .
 
-# Expose port 8080 for the application
-EXPOSE 8080
-
-# Build the application
+# Build app (NestJS build ra dist/)
 RUN npm run build
 
-# Run the application
+# Production dependencies stage
+FROM node:20-slim AS prod-deps
+
+WORKDIR /usr/src/app
+
+COPY package.json package-lock.json ./
+
+RUN npm install --only=production
+
+# Final stage
+FROM node:20-slim
+
+ARG PORT=3000
+
+# Tạo thư mục app
+WORKDIR /usr/src/app
+
+# Copy built dist và node_modules từ các stage trước
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
+
+# Copy các file cần thiết khác (ví dụ env, config)
+COPY package.json ./
+
+# Expose port
+EXPOSE $PORT
+
+# Run app
 CMD ["npm", "run", "start:prod"]
