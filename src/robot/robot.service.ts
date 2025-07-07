@@ -5,10 +5,7 @@ import { Robot } from './entity/robot.entity';
 import { CreateRobotDto } from './dto/create-robot.dto';
 import { Process } from 'src/processes/entity/process.entity';
 import { ProcessNotFoundException, RobotNotFoundException } from 'src/common/exceptions';
-import {
-  S3Client,
-  PutObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { ConnectionService } from 'src/connection/connection.service';
 import { CreateRobotDtoV2 } from './dto/create-robot-v2.dto';
@@ -26,13 +23,22 @@ export class RobotService {
     private connectionService: ConnectionService,
     private configService: ConfigService,
   ) {
-    this.s3Client = new S3Client({ region: configService.get('AWS_REGION_EXTRA') });
+    this.s3Client = new S3Client({
+      region: configService.get('AWS_REGION_EXTRA'),
+      credentials: {
+        accessKeyId: configService.get('AWS_KEY_ID'),
+        secretAccessKey: configService.get('AWS_SECRET_KEY'),
+      },
+    });
   }
 
-  async getRobots(userId: number, options?: {
-    limit?: number;
-    page?: number;
-  }) {
+  async getRobots(
+    userId: number,
+    options?: {
+      limit?: number;
+      page?: number;
+    },
+  ) {
     const findOptions = {
       where: { userId },
     };
@@ -51,7 +57,7 @@ export class RobotService {
   }
 
   async createRobot(userId: number, createRobotDto: CreateRobotDtoV2) {
-    const providers = createRobotDto.providers
+    const providers = createRobotDto.providers;
     const process = await this.processRepository.findOne({
       where: { id: createRobotDto.processId, userId },
     });
@@ -69,39 +75,40 @@ export class RobotService {
     await this.s3Client.send(command);
 
     const robotInfo = await this.createRobotDb(createRobotDto, process, userId);
-    const robotKey = robotInfo.robotKey
+    const robotKey = robotInfo.robotKey;
     if (providers) {
       // Create Robot Connection
       await this.connectionService.addRobotConnection(userId, robotKey, providers);
     }
-    return robotInfo
+    return robotInfo;
   }
 
-  async createRobotDb(createRobotDto: CreateRobotDtoV2, process: Process, userId: number): Promise<Robot> {
+  async createRobotDb(
+    createRobotDto: CreateRobotDtoV2,
+    process: Process,
+    userId: number,
+  ): Promise<Robot> {
     try {
       // Create Robot
       await this.robotRepository.save({
         ...createRobotDto,
         userId,
         processVersion: process.version,
-      })
+      });
 
       return await this.robotRepository.findOne({
         where: {
           userId: userId,
           processId: process.id,
-          processVersion: process.version        
-        }
-      })
+          processVersion: process.version,
+        },
+      });
     } catch (error) {
-      console.log(error)
-      throw new BadRequestException(
-        'Something bad happened',
-        {
-          cause: error,
-          description: 'Error occur when saving robot'
-        }
-      )
+      console.log(error);
+      throw new BadRequestException('Something bad happened', {
+        cause: error,
+        description: 'Error occur when saving robot',
+      });
     }
   }
 
