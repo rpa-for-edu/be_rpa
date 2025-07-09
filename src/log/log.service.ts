@@ -18,6 +18,10 @@ export class LogService {
   constructor(private configService: ConfigService) {
     this.cloudWatchLogsClient = new CloudWatchLogsClient({
       region: this.configService.get<string>('AWS_REGION_EXTRA'),
+      credentials: {
+        accessKeyId: this.configService.get<string>('AWS_KEY_ID'),
+        secretAccessKey: this.configService.get<string>('AWS_SECRET_KEY'),
+      },
     });
   }
 
@@ -28,7 +32,7 @@ export class LogService {
       nextToken: nextToken,
     };
 
-    try { 
+    try {
       const command = new DescribeLogGroupsCommand(params);
       const { logGroups, nextToken: newToken } = await this.cloudWatchLogsClient.send(command);
 

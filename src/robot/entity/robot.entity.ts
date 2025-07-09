@@ -53,10 +53,6 @@ export class Robot {
   })
   triggerType: TriggerType;
 
-  @Column({
-    nullable: false,
-    name: 'robot_key',
-    unique: true,
-  })
+  @PrimaryGeneratedColumn('uuid')
   robotKey: string;
 }
