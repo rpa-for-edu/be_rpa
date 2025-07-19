@@ -62,15 +62,15 @@ ALTER TABLE connection
 CREATE INDEX idx_connection_key ON connection(connection_key);
 
 
-DELIMITER //
-DROP TRIGGER IF EXISTS before_connection_insert;
-CREATE TRIGGER before_connection_insert
-BEFORE INSERT ON connection
-FOR EACH ROW
-BEGIN
-    SET NEW.connection_key = SHA2(CONCAT(NEW.userId, NEW.name , NEW.provider), 256);
-END//
-DELIMITER ;
+    DELIMITER //
+    DROP TRIGGER IF EXISTS before_connection_insert;
+    CREATE TRIGGER before_connection_insert
+    BEFORE INSERT ON connection
+    FOR EACH ROW
+    BEGIN
+        SET NEW.connection_key = SHA2(CONCAT(NEW.userId, NEW.name , NEW.provider), 256);
+    END//
+    DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS update_old_connections;
