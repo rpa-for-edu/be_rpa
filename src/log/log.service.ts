@@ -17,7 +17,7 @@ export class LogService {
 
   constructor(private configService: ConfigService) {
     this.cloudWatchLogsClient = new CloudWatchLogsClient({
-      region: this.configService.get<string>('AWS_REGION_EXTRA'),
+      region: this.configService.get<string>('AWS_REGION_EXTRA_1'),
       credentials: {
         accessKeyId: this.configService.get<string>('AWS_KEY_ID'),
         secretAccessKey: this.configService.get<string>('AWS_SECRET_KEY'),
