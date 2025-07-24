@@ -19,6 +19,7 @@ import { GoogleSheetsStrategy } from './strategy/google.sheets.strategy';
 import { GoogleClassroomStrategy } from './strategy/google.classroom.strategy';
 import { GoogleFormsStrategy } from './strategy/google.forms.strategy';
 import { HeaderApiKeyStrategy } from './strategy/api-key.stategy';
+import { SAPMockStrategy } from './strategy/sap-mock.strategy';
 
 @Module({
   imports: [
@@ -45,11 +46,12 @@ import { HeaderApiKeyStrategy } from './strategy/api-key.stategy';
     GoogleSheetsStrategy,
     GoogleClassroomStrategy,
     GoogleFormsStrategy,
+    SAPMockStrategy,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    HeaderApiKeyStrategy
+    HeaderApiKeyStrategy,
   ],
   controllers: [AuthController],
 })

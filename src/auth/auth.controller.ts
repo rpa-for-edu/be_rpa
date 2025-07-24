@@ -8,6 +8,7 @@ import {
   Query,
   Res,
   UseFilters,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiTags, ApiOAuth2, ApiQuery } from '@nestjs/swagger';
@@ -23,7 +24,7 @@ import { UserTokenFromProvider } from 'src/connection/connection.service';
 import { AuthorizationProvider } from 'src/connection/entity/connection.entity';
 import { GmailOauthGuard } from './guard/gmail-oath.guard';
 import { GoogleSheetsOauthGuard } from './guard/google-sheets-oath.guard';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import {
   HttpExceptionRedirectISFilter,
@@ -31,6 +32,7 @@ import {
 } from 'src/common/filters/http-exception-redirect.filter';
 import { GoogleClassroomOauthGuard } from './guard/google-classroom-oath.guard';
 import { GoogleFormsOauthGuard } from './guard/google-forms-oauth.guard';
+import { SAPMockGuard } from './guard/sap-mock.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -289,6 +291,31 @@ export class AuthController {
     res.redirect(
       `${this.configService.get('FRONTEND_URL')}/integration-service?provider=${
         AuthorizationProvider.G_FORMS
+      }&message=${message}`,
+    );
+  }
+
+  @Get('sap-mock')
+  @UseGuards(SAPMockGuard)
+  async getSAPToken(
+    @UserDecor() user: UserTokenFromProvider,
+    @Res() res: Response,
+    @Req() req: Request,
+  ) {
+    const { fromUser } = req.query;
+    const states = {
+      fromUser,
+      reconnect: false,
+    };
+    await this.authService.authorizeUserFromProvider(
+      user,
+      JSON.stringify(states),
+      AuthorizationProvider.SAP_MOCK,
+    );
+    const message = 'Authorized SAP Mock successfully!';
+    res.redirect(
+      `${this.configService.get('FRONTEND_URL')}/integration-service?provider=${
+        AuthorizationProvider.SAP_MOCK
       }&message=${message}`,
     );
   }

@@ -191,6 +191,27 @@ export class ConnectionService {
     return query.getMany();
   }
 
+  async updateconnectionAccessToken(
+    userId: number,
+    accessToken: string,
+    provider: AuthorizationProvider,
+  ) {
+    const connection = await this.connectionRepository.findOneBy({
+      userId,
+      provider,
+    });
+
+    if (!connection) {
+      console.log('Connection not found');
+      return false;
+    }
+
+    connection.accessToken = accessToken;
+
+    await this.connectionRepository.save(connection);
+    return true;
+  }
+
   async addRobotConnection(userId: number, robotKey: string, providers: CreateRobotProvider[]) {
     return this.robotConnectionRepository.save(
       providers.map((c) => ({

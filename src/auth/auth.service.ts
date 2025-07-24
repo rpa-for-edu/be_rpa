@@ -105,9 +105,21 @@ export class AuthService {
     } catch (error) {
       throw new InvalidStateException();
     }
-
+    if (provider === AuthorizationProvider.SAP_MOCK) {
+      console.log('SAP Mock provider detected, skipping email check');
+      const update = await this.connectionSerivce.updateconnectionAccessToken(
+        fromUser,
+        userToken.accessToken,
+        provider,
+      );
+      if (update) {
+        console.log('Connection access token updated successfully');
+        return;
+      }
+    }
     const { accessToken, refreshToken, profile } = userToken;
-    const email = profile.emails?.[0].value;
+    const email = profile?.emails?.[0].value;
+
     await this.connectionSerivce.createConnection(
       {
         fromUser,
