@@ -150,7 +150,7 @@ jobs:
             cd /home/${{ secrets.EC2_USER }}/be_rpa_app
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
             docker compose -f docker-compose-staging.yml down
-            docker rmi $IMAGE_NAME:latest || true
+            docker rmi "$IMAGE_NAME":latest || true
             docker compose -f docker-compose-staging.yml pull
             docker compose -f docker-compose-staging.yml up -d
         env:
