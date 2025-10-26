@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: ghcr.io/chiencse/be_rpa_app:latest
+    image: ghcr.io/rpa-for-erp/be_rpa_app:latest
     container_name: be_rpa_app
     env_file:
       - .env
