@@ -16,17 +16,20 @@ export class NotificationService {
     private notificationRepository: Repository<Notification>,
     private configService: ConfigService,
   ) {
-    this.pubnub = new PubNub({
-      subscribeKey: this.configService.get('PUBNUB_SUBSCRIBE_KEY'),
-      publishKey: this.configService.get('PUBNUB_PUBLISH_KEY'),
-      userId: this.configService.get('PUBNUB_USER_ID'),
-    });
+    // this.pubnub = new PubNub({
+    //   subscribeKey: this.configService.get('PUBNUB_SUBSCRIBE_KEY'),
+    //   publishKey: this.configService.get('PUBNUB_PUBLISH_KEY'),
+    //   userId: this.configService.get('PUBNUB_USER_ID'),
+    // });
   }
 
-  async getNotifications(userId: number, options: {
-    limit: number;
-    page: number;
-  }) {
+  async getNotifications(
+    userId: number,
+    options: {
+      limit: number;
+      page: number;
+    },
+  ) {
     const findOptions: FindManyOptions<Notification> = {
       where: { userId },
       take: options.limit,
@@ -48,6 +51,7 @@ export class NotificationService {
   }
 
   async createNotification(createNotificationDto: CreateNotificationDto) {
+    return null;
     const notification = await this.notificationRepository.save({
       ...createNotificationDto,
     });
