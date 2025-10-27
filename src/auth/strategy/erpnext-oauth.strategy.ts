@@ -22,10 +22,12 @@ export class ErpNextOAuthStrategy extends PassportStrategy(Strategy, 'erpnext-oa
 
       // ⚡ Nếu chưa có code → redirect tới ERPNext authorize
       if (!code) {
-        const state = JSON.stringify({
-          fromUser: true,
-          reconnect: false,
-        });
+        const state = encodeURIComponent(
+          JSON.stringify({
+            fromUser: true,
+            reconnect: false,
+          }),
+        );
 
         const params = new URLSearchParams({
           client_id: ERP_CLIENT_ID,
