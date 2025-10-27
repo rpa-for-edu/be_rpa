@@ -9,7 +9,7 @@ export enum AuthorizationProvider {
   G_CLASSROOM = 'Google Classroom',
   G_FORMS = 'Google Forms',
   SAP_MOCK = 'SAP Mock',
-  ERPNext = 'ERPNext',
+  ERP_Next = 'ERP_Next',
 }
 
 @Entity()

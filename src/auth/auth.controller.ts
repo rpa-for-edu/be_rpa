@@ -33,6 +33,7 @@ import {
 import { GoogleClassroomOauthGuard } from './guard/google-classroom-oath.guard';
 import { GoogleFormsOauthGuard } from './guard/google-forms-oauth.guard';
 import { SAPMockGuard } from './guard/sap-mock.guard';
+import { ErpNextOAuthGuard } from './guard/erpnext-oauth.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -316,6 +317,23 @@ export class AuthController {
     res.redirect(
       `${this.configService.get('FRONTEND_URL')}/integration-service?provider=${
         AuthorizationProvider.SAP_MOCK
+      }&message=${message}`,
+    );
+  }
+
+  @Get('erpnext')
+  @UseGuards(ErpNextOAuthGuard)
+  async erpNextAuth(
+    @UserDecor() user: UserTokenFromProvider,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    await this.authService.authorizeUserFromProvider(user, state, AuthorizationProvider.ERP_Next);
+
+    const message = 'Authorized ERPNext successfully!';
+    res.redirect(
+      `${this.configService.get('FRONTEND_URL')}/integration-service?provider=${
+        AuthorizationProvider.ERP_Next
       }&message=${message}`,
     );
   }
