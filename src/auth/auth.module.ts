@@ -20,6 +20,8 @@ import { GoogleClassroomStrategy } from './strategy/google.classroom.strategy';
 import { GoogleFormsStrategy } from './strategy/google.forms.strategy';
 import { HeaderApiKeyStrategy } from './strategy/api-key.stategy';
 import { SAPMockStrategy } from './strategy/sap-mock.strategy';
+import { ErpNextOAuthGuard } from './guard/erpnext-oauth.guard';
+import { ErpNextOAuthStrategy } from './strategy/erpnext-oauth.strategy';
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { SAPMockStrategy } from './strategy/sap-mock.strategy';
     GoogleClassroomStrategy,
     GoogleFormsStrategy,
     SAPMockStrategy,
+    ErpNextOAuthStrategy,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
