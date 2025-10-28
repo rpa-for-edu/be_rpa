@@ -326,8 +326,13 @@ export class AuthController {
   async erpNextAuth(
     @UserDecor() user: UserTokenFromProvider,
     @Res() res: Response,
-    @Query('state') state,
+    @Query('fromUser') fromUser: string,
   ) {
+    const state = JSON.stringify({
+      fromUser,
+      reconnect: false,
+    });
+
     await this.authService.authorizeUserFromProvider(user, state, AuthorizationProvider.ERP_Next);
 
     const message = 'Authorized ERPNext successfully!';

@@ -18,26 +18,19 @@ export class ErpNextOAuthStrategy extends PassportStrategy(Strategy, 'erpnext-oa
       const ERP_CLIENT_SECRET = this.config.get<string>('ERP_CLIENT_SECRET');
       const ERP_REDIRECT_URI = this.config.get<string>('ERP_REDIRECT_URI');
 
-      const { code } = req.query;
-      console.log('ERPNext OAuth2 code:', code);
+      const { fromUser, code } = req.query;
+
       // ⚡ Nếu chưa có code → redirect tới ERPNext authorize
       if (!code) {
-        const encodedState = encodeURIComponent(
-          JSON.stringify({
-            fromUser: true,
-            reconnect: false,
-          }),
-        );
+        const params = new URLSearchParams({
+          client_id: ERP_CLIENT_ID,
+          response_type: 'code',
+          scope: 'all openid',
+          redirect_uri: ERP_REDIRECT_URI,
+          fromUser: fromUser as string,
+        });
 
-        const authorizeUrl =
-          `${ERP_BASE_URL}/api/method/frappe.integrations.oauth2.authorize` +
-          `?client_id=${ERP_CLIENT_ID}` +
-          `&response_type=code` +
-          `&scope=all%20openid` + // ⚠️ ERPNext không hiểu dấu '+'
-          `&redirect_uri=${encodeURIComponent(ERP_REDIRECT_URI)}` +
-          `&state=${encodedState}`;
-
-        // const authorizeUrl = `${ERP_BASE_URL}/api/method/frappe.integrations.oauth2.authorize?${params.toString()}`;
+        const authorizeUrl = `${ERP_BASE_URL}/api/method/frappe.integrations.oauth2.authorize?${params.toString()}`;
         console.log('Redirecting to ERPNext OAuth2 authorize:', authorizeUrl);
         (req.res as any).redirect(authorizeUrl);
         return null;
