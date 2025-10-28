@@ -113,7 +113,7 @@ export class AuthService {
         console.log('SAP Mock provider detected, skipping email check');
       if (provider === AuthorizationProvider.ERP_Next)
         console.log('ERP Next provider detected, skipping email check');
-
+      console.log('provider:', provider);
       const update = await this.connectionSerivce.updateconnectionAccessToken(
         fromUser,
         userToken.accessToken,
