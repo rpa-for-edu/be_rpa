@@ -328,7 +328,7 @@ export class AuthController {
     @Res() res: Response,
     @Query('state') state: string,
   ) {
-    const decodedState = state ? JSON.parse(decodeURIComponent(state)) : {};
+    const decodedState = state ? decodeURIComponent(state) : '';
     console.log('ERPNext OAuth2 state:', decodedState);
     await this.authService.authorizeUserFromProvider(
       user,
