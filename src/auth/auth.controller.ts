@@ -160,7 +160,7 @@ export class AuthController {
   ) {
     await this.authService.authorizeUserFromProvider(
       userToken,
-      state,
+      decodeURIComponent(state as string),
       AuthorizationProvider.G_GMAIL,
     );
     const message = 'Authorized Gmail successfully!';
