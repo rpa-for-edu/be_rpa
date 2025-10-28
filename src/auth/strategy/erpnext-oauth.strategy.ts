@@ -19,15 +19,21 @@ export class ErpNextOAuthStrategy extends PassportStrategy(Strategy, 'erpnext-oa
       const ERP_REDIRECT_URI = this.config.get<string>('ERP_REDIRECT_URI');
 
       const { fromUser, code } = req.query;
+      const state = encodeURIComponent(
+        JSON.stringify({
+          fromUser: fromUser as string,
+          reconnect: false,
+        }),
+      );
 
-      // ⚡ Nếu chưa có code → redirect tới ERPNext authorize
+      // Nếu chưa có code → redirect tới ERPNext authorize
       if (!code) {
         const params = new URLSearchParams({
           client_id: ERP_CLIENT_ID,
           response_type: 'code',
           scope: 'all openid',
           redirect_uri: ERP_REDIRECT_URI,
-          fromUser: fromUser as string,
+          state,
         });
 
         const authorizeUrl = `${ERP_BASE_URL}/api/method/frappe.integrations.oauth2.authorize?${params.toString()}`;
@@ -36,7 +42,7 @@ export class ErpNextOAuthStrategy extends PassportStrategy(Strategy, 'erpnext-oa
         return null;
       }
 
-      // ⚙️ Nếu có code → đổi code lấy token
+      // Nếu có code → đổi code lấy token
       const tokenParams = new URLSearchParams({
         grant_type: 'authorization_code',
         code: code as string,

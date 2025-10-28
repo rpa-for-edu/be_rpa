@@ -332,7 +332,7 @@ export class AuthController {
       fromUser,
       reconnect: false,
     });
-
+    console.log('ERPNext OAuth2 state:', state);
     await this.authService.authorizeUserFromProvider(user, state, AuthorizationProvider.ERP_Next);
 
     const message = 'Authorized ERPNext successfully!';
