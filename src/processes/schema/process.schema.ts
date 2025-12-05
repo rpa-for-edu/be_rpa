@@ -1,16 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ActivityTemplate } from 'src/activity-packages/schema/activity-package.schema';
-import {
-  IsNotEmpty,
-  IsString,
-} from 'class-validator';
-import {
-  IsVariablesOfRequiredFormat
-} from '../decorator/IsVariablesOfRequiredFormat.decorator';
-import {
-  IsActivitiesOfRequiredFormat
-} from '../decorator/IsActivitiesOfRequiredFormat.decorator';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { IsVariablesOfRequiredFormat } from '../decorator/IsVariablesOfRequiredFormat.decorator';
+import { IsActivitiesOfRequiredFormat } from '../decorator/IsActivitiesOfRequiredFormat.decorator';
 
 export enum VariableType {
   CONNECTION_DRIVE = 'connection.Google Drive',
@@ -27,6 +20,15 @@ export type ScalarType = Extract<VariableType, 'string' | 'number' | 'boolean' |
 @Schema({
   minimize: false,
   collection: 'processes',
+  toJSON: {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+      delete ret.$__;
+      delete ret.$isNew;
+      return ret;
+    },
+  },
 })
 export class ProcessDetail extends Document {
   @Prop()
@@ -38,13 +40,13 @@ export class ProcessDetail extends Document {
   })
   xml: string;
 
-  @Prop({ 
+  @Prop({
     required: true,
-    type: Object, 
+    type: Object,
   })
   variables: Variables;
 
-  @Prop({ 
+  @Prop({
     required: true,
     type: [Object],
   })
@@ -76,13 +78,13 @@ export class ProcessForValidation {
 }
 
 export interface Variables {
-  [variableName: string]: Variable
+  [variableName: string]: Variable;
 }
 
 export interface Variable {
-  type: VariableType,
-  isArgument: boolean,
-  defaultValue: any, 
+  type: VariableType;
+  isArgument: boolean;
+  defaultValue: any;
 }
 
 // NOTE: the schema is set based on what is stored in the browser's local storage. It will be changed later.
