@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ActivityPackage } from './activity-packages/schema/activity-package.schema';
 import { DocumentTemplateDetail } from './document-template/schema/document-template.schema';
 import { ProcessDetail } from './processes/schema/process.schema';
@@ -14,8 +14,8 @@ async function bootstrap() {
 
   // initialize Swagger
   const config = new DocumentBuilder()
-    .setTitle('EduRPA API')
-    .setDescription('API for EduRPA')
+    .setTitle('ErpRPA API')
+    .setDescription('API for ErpRPA')
     .setVersion('1.0')
     .addBearerAuth()
     .addOAuth2()
@@ -24,7 +24,14 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config, {
     extraModels: [ActivityPackage, DocumentTemplateDetail, ProcessDetail],
   });
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
+  // Enable automatic serialization to exclude sensitive fields
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.useGlobalPipes(
     new ValidationPipe({

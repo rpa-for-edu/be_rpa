@@ -21,6 +21,7 @@ import { LogModule } from './log/log.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskScheduleModule } from './task-schedule/task-schedule.module';
 import { RobotReportModule } from './robot-report/robot-report.module';
+import { WorkspaceModule } from './workspace/workspace.module';
 
 const ENV_FILE_PATH =
   process.env.NODE_ENV === 'production'
@@ -90,6 +91,7 @@ const ENV_FILE_PATH =
     LogModule,
     TaskScheduleModule,
     RobotReportModule,
+    WorkspaceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
