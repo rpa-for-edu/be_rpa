@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 export enum AuthenticationProvider {
   GOOGLE = 'Google',
@@ -23,6 +24,7 @@ export class User {
   })
   avatarUrl: string;
 
+  @Exclude()
   @Column({
     nullable: true,
   })
@@ -36,6 +38,7 @@ export class User {
   })
   provider: string;
 
+  @Exclude()
   @Column({
     nullable: true,
   })

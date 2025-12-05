@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { User } from 'src/users/entity/user.entity';
 import { Process } from 'src/processes/entity/process.entity';
+import { Workspace } from 'src/workspace/entity/workspace.entity';
+import { Team } from 'src/workspace/entity/team.entity';
 
 export enum TriggerType {
   SCHEDULE = 'schedule',
@@ -16,6 +18,12 @@ export enum TriggerType {
   EVENT_GMAIL = 'event-gmail',
   EVENT_DRIVE = 'event-drive',
   EVENT_FORMS = 'event-forms',
+}
+
+export enum RobotScope {
+  PERSONAL = 'personal',
+  TEAM = 'team',
+  WORKSPACE = 'workspace',
 }
 
 @Entity()
@@ -28,19 +36,19 @@ export class Robot {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @PrimaryColumn()
+  @Column()
   userId: number;
 
   @ManyToOne(() => User, (user) => user.id)
   user: User;
 
-  @PrimaryColumn()
+  @Column()
   processId: string;
 
   @ManyToOne(() => Process, (process) => process.id)
   process: Process;
 
-  @PrimaryColumn()
+  @Column()
   processVersion: number;
 
   @CreateDateColumn()
@@ -53,6 +61,25 @@ export class Robot {
   })
   triggerType: TriggerType;
 
-  @PrimaryGeneratedColumn('uuid', { name: 'robot_key' })
+  @Column('uuid', { name: 'robot_key', generated: 'uuid', unique: true })
   robotKey: string;
+
+  @Column({
+    type: 'enum',
+    enum: RobotScope,
+    default: RobotScope.PERSONAL,
+  })
+  scope: RobotScope;
+
+  @Column({ nullable: true })
+  workspaceId: string;
+
+  @ManyToOne(() => Workspace, { nullable: true })
+  workspace: Workspace;
+
+  @Column({ nullable: true })
+  teamId: string;
+
+  @ManyToOne(() => Team, { nullable: true })
+  team: Team;
 }

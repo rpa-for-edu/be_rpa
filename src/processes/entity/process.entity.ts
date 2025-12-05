@@ -1,5 +1,20 @@
-import { Entity, Column, ManyToOne, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { User } from '../../users/entity/user.entity';
+import { Workspace } from '../../workspace/entity/workspace.entity';
+import { Team } from '../../workspace/entity/team.entity';
+
+export enum ProcessScope {
+  PERSONAL = 'personal',
+  TEAM = 'team',
+  WORKSPACE = 'workspace',
+}
 
 @Entity()
 export class Process {
@@ -42,4 +57,23 @@ export class Process {
 
   @ManyToOne(() => User, (user) => user.id)
   sharedByUser: User;
+
+  @Column({
+    type: 'enum',
+    enum: ProcessScope,
+    default: ProcessScope.PERSONAL,
+  })
+  scope: ProcessScope;
+
+  @Column({ nullable: true })
+  workspaceId: string;
+
+  @ManyToOne(() => Workspace, { nullable: true })
+  workspace: Workspace;
+
+  @Column({ nullable: true })
+  teamId: string;
+
+  @ManyToOne(() => Team, { nullable: true })
+  team: Team;
 }
