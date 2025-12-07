@@ -428,6 +428,17 @@ export class WorkspaceService {
     const team = await this.checkTeamMembership(teamId, userId);
     await this.checkWorkspacePermission(team.workspaceId, userId, [WorkspaceMemberRole.OWNER]);
 
+    // Cascade delete: Delete all related records first
+    // 1. Delete team invitations
+    await this.teamInvitationRepository.delete({ teamId });
+
+    // 2. Delete team members
+    await this.teamMemberRepository.delete({ teamId });
+
+    // 3. Delete roles (this will also remove role_permission and role_activity_template via join tables)
+    await this.roleRepository.delete({ teamId });
+
+    // 4. Finally delete the team
     const result = await this.teamRepository.delete({ id: teamId });
 
     if (result.affected === 0) {

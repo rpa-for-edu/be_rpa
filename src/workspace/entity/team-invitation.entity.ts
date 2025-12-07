@@ -33,7 +33,7 @@ export class TeamInvitation {
   @Column({ nullable: true })
   invitedUserId: number;
 
-  @ManyToOne(() => Role)
+  @ManyToOne(() => Role, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'roleId' })
   role: Role;
 
