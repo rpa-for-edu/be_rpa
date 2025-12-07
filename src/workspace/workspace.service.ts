@@ -683,13 +683,13 @@ export class WorkspaceService {
 
   async removeWorkspaceMember(
     workspaceId: string,
-    memberId: string,
+    memberId: number,
     userId: number,
   ): Promise<void> {
     await this.checkWorkspacePermission(workspaceId, userId, [WorkspaceMemberRole.OWNER]);
 
     const member = await this.workspaceMemberRepository.findOne({
-      where: { id: memberId, workspaceId },
+      where: { userId: memberId, workspaceId },
     });
 
     if (!member) {

@@ -283,11 +283,11 @@ export class WorkspaceController {
   @Delete(':workspaceId/member/:memberId')
   @ApiOperation({ summary: 'Remove member from workspace' })
   @ApiParam({ name: 'workspaceId', type: 'string' })
-  @ApiParam({ name: 'memberId', type: 'string' })
+  @ApiParam({ name: 'memberId', type: 'number' })
   @ApiOkResponse({ type: ApiResponseDto<null> })
   async removeWorkspaceMember(
     @Param('workspaceId') workspaceId: string,
-    @Param('memberId') memberId: string,
+    @Param('memberId') memberId: number,
     @UserDecor() user: UserPayload,
   ): Promise<ApiResponseDto<null>> {
     await this.workspaceService.removeWorkspaceMember(workspaceId, memberId, user.id);
