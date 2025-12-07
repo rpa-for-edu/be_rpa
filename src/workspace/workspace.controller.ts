@@ -21,6 +21,8 @@ import {
   RespondInvitationDto,
   CreatePermissionDto,
   UpdatePermissionDto,
+  AddPackageToTeamDto,
+  RemovePackageFromTeamDto,
 } from './dto/workspace.dto';
 import {
   WorkspaceResponseDto,
@@ -348,6 +350,34 @@ export class WorkspaceController {
   ): Promise<ApiResponseDto<null>> {
     await this.workspaceService.removeTeamMember(teamId, memberId, user.id);
     return ResponseUtil.deleted(WorkspaceMessages.TEAM_MEMBER_REMOVED);
+  }
+
+  // ==================== Team Package Management Endpoints ====================
+  @Post('team/:teamId/package')
+  @ApiOperation({ summary: 'Add activity package to team (Team Owner only)' })
+  @ApiParam({ name: 'teamId', type: 'string' })
+  @ApiOkResponse({ type: ApiResponseDto<null> })
+  async addPackageToTeam(
+    @Param('teamId') teamId: string,
+    @UserDecor() user: UserPayload,
+    @Body() dto: AddPackageToTeamDto,
+  ): Promise<ApiResponseDto<null>> {
+    await this.workspaceService.addPackageToTeam(teamId, user.id, dto.packageId);
+    return ResponseUtil.created(null, WorkspaceMessages.PACKAGE_ADDED_TO_TEAM);
+  }
+
+  @Delete('team/:teamId/package/:packageId')
+  @ApiOperation({ summary: 'Remove activity package from team (Team Owner only)' })
+  @ApiParam({ name: 'teamId', type: 'string' })
+  @ApiParam({ name: 'packageId', type: 'string' })
+  @ApiOkResponse({ type: ApiResponseDto<null> })
+  async removePackageFromTeam(
+    @Param('teamId') teamId: string,
+    @Param('packageId') packageId: string,
+    @UserDecor() user: UserPayload,
+  ): Promise<ApiResponseDto<null>> {
+    await this.workspaceService.removePackageFromTeam(teamId, user.id, packageId);
+    return ResponseUtil.deleted(WorkspaceMessages.PACKAGE_REMOVED_FROM_TEAM);
   }
 
   // ==================== Invitation Endpoints ====================

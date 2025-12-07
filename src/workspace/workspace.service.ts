@@ -371,7 +371,7 @@ export class WorkspaceService {
       name: 'Owner',
       description: 'Team owner with full permissions',
       teamId: savedTeam.id,
-      isDefault: false,
+      isDefault: true,
       permissions: [],
     });
 
@@ -429,16 +429,19 @@ export class WorkspaceService {
     await this.checkWorkspacePermission(team.workspaceId, userId, [WorkspaceMemberRole.OWNER]);
 
     // Cascade delete: Delete all related records first
-    // 1. Delete team invitations
+    // 1. Delete activity package access
+    await this.activityPackageAccessRepository.delete({ teamId });
+
+    // 2. Delete team invitations
     await this.teamInvitationRepository.delete({ teamId });
 
-    // 2. Delete team members
+    // 3. Delete team members
     await this.teamMemberRepository.delete({ teamId });
 
-    // 3. Delete roles (this will also remove role_permission and role_activity_template via join tables)
+    // 4. Delete roles (this will also remove role_permission and role_activity_template via join tables)
     await this.roleRepository.delete({ teamId });
 
-    // 4. Finally delete the team
+    // 5. Finally delete the team
     const result = await this.teamRepository.delete({ id: teamId });
 
     if (result.affected === 0) {
@@ -1162,6 +1165,69 @@ export class WorkspaceService {
       throw new ForbiddenException(
         `You don't have permission to ${action} ${resource} with this template`,
       );
+    }
+  }
+
+  // ==================== Team Package Management ====================
+  /**
+   * Check if user is team owner
+   */
+  private async checkTeamOwnership(teamId: string, userId: number): Promise<void> {
+    const teamMember = await this.teamMemberRepository.findOne({
+      where: { teamId, userId },
+      relations: ['role'],
+    });
+
+    if (!teamMember || teamMember.role.name !== 'Owner') {
+      throw new ForbiddenException('Only team owner can manage activity packages');
+    }
+  }
+
+  /**
+   * Add activity package access to team
+   */
+  async addPackageToTeam(teamId: string, userId: number, packageId: string): Promise<void> {
+    // Check team membership
+    await this.checkTeamMembership(teamId, userId);
+
+    // Check team ownership
+    await this.checkTeamOwnership(teamId, userId);
+
+    // Check if package access already exists
+    const existingAccess = await this.activityPackageAccessRepository.findOne({
+      where: { teamId, packageId },
+    });
+
+    if (existingAccess) {
+      throw new ConflictException('Package already added to this team');
+    }
+
+    // Add package access
+    await this.activityPackageAccessRepository.save({
+      packageId,
+      teamId,
+      hasAccess: true,
+    });
+  }
+
+  /**
+   * Remove activity package access from team
+   */
+  async removePackageFromTeam(teamId: string, userId: number, packageId: string): Promise<void> {
+    // Check team membership
+    await this.checkTeamMembership(teamId, userId);
+
+    // Check team ownership
+    await this.checkTeamOwnership(teamId, userId);
+
+    // Remove package access
+    const result = await this.activityPackageAccessRepository.delete({
+      teamId,
+      packageId,
+    });
+
+    if (result.affected === 0) {
+      throw new NotFoundException('Package access not found for this team');
     }
   }
 }

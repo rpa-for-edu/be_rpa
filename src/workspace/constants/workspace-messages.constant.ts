@@ -40,6 +40,10 @@ export const WorkspaceMessages = {
   TEAM_MEMBER_REMOVED: 'Team member removed successfully',
   TEAM_MEMBERS_FOUND: 'Team members retrieved successfully',
 
+  // Team Package
+  PACKAGE_ADDED_TO_TEAM: 'Activity package added to team successfully',
+  PACKAGE_REMOVED_FROM_TEAM: 'Activity package removed from team successfully',
+
   // Invitation
   INVITATION_SENT: 'Invitation sent successfully',
   INVITATION_ACCEPTED: 'Invitation accepted successfully',
