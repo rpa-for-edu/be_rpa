@@ -221,7 +221,7 @@ export class WorkspaceService {
   async getAllWorkspaces(userId: number): Promise<SimpleWorkspaceResponseDto[]> {
     const members = await this.workspaceMemberRepository.find({
       where: { userId },
-      relations: ['workspace', 'workspace.owner'],
+      relations: ['workspace', 'workspace.owner', 'workspace.members'],
     });
 
     const workspaces = members.map((member) => this.sanitizeWorkspace(member.workspace));
