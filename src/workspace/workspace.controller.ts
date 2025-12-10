@@ -330,7 +330,7 @@ export class WorkspaceController {
   @ApiOkResponse({ type: ApiResponseDto<null> })
   async updateTeamMemberRole(
     @Param('teamId') teamId: string,
-    @Param('memberId') memberId: number,
+    @Param('memberId') memberId: string,
     @UserDecor() user: UserPayload,
     @Body() dto: UpdateMemberRoleDto,
   ): Promise<ApiResponseDto<null>> {

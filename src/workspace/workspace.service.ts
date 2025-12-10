@@ -277,7 +277,46 @@ export class WorkspaceService {
 
   async deleteWorkspace(workspaceId: string, userId: number): Promise<void> {
     await this.checkWorkspacePermission(workspaceId, userId, [WorkspaceMemberRole.OWNER]);
-    await this.workspaceRepository.delete(workspaceId);
+
+    // Use query runner for transactional deletion
+    const queryRunner = this.workspaceRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Get all teams in workspace
+      const teams = await queryRunner.manager.find('team', { where: { workspaceId } });
+
+      // For each team, delete all related records
+      for (const team of teams) {
+        const teamId = (team as any).id;
+
+        // Delete team-related records in correct order
+        await queryRunner.manager.delete('activity_package_access', { teamId });
+        await queryRunner.manager.delete('team_invitation', { teamId });
+        await queryRunner.manager.delete('team_member', { teamId });
+        await queryRunner.manager.delete('role', { teamId });
+        await queryRunner.manager.delete('team', { id: teamId });
+      }
+
+      // Delete workspace-related records
+      await queryRunner.manager.delete('workspace_invitation', { workspaceId });
+      await queryRunner.manager.delete('workspace_member', { workspaceId });
+
+      // Finally delete workspace
+      const result = await queryRunner.manager.delete('workspace', { id: workspaceId });
+
+      if (result.affected === 0) {
+        throw new NotFoundException('Workspace not found');
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async leaveWorkspace(workspaceId: string, userId: number): Promise<void> {
@@ -428,24 +467,40 @@ export class WorkspaceService {
     const team = await this.checkTeamMembership(teamId, userId);
     await this.checkWorkspacePermission(team.workspaceId, userId, [WorkspaceMemberRole.OWNER]);
 
-    // Cascade delete: Delete all related records first
-    // 1. Delete activity package access
-    await this.activityPackageAccessRepository.delete({ teamId });
+    // Use query runner for transactional deletion to ensure proper order
+    const queryRunner = this.teamRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    // 2. Delete team invitations
-    await this.teamInvitationRepository.delete({ teamId });
+    try {
+      // Cascade delete: Delete all related records in correct order
+      // Must delete child records before parent records to avoid FK constraint errors
 
-    // 3. Delete team members
-    await this.teamMemberRepository.delete({ teamId });
+      // 1. Delete activity package access (no FK dependencies)
+      await queryRunner.manager.delete('activity_package_access', { teamId });
 
-    // 4. Delete roles (this will also remove role_permission and role_activity_template via join tables)
-    await this.roleRepository.delete({ teamId });
+      // 2. Delete team invitations FIRST (has FK to role, so delete before roles)
+      await queryRunner.manager.delete('team_invitation', { teamId });
 
-    // 5. Finally delete the team
-    const result = await this.teamRepository.delete({ id: teamId });
+      // 3. Delete team members (has FK to role, so delete before roles)
+      await queryRunner.manager.delete('team_member', { teamId });
 
-    if (result.affected === 0) {
-      throw new NotFoundException('Team not found');
+      // 4. Delete roles (this will also remove role_permission and role_activity_template via join tables)
+      await queryRunner.manager.delete('role', { teamId });
+
+      // 5. Finally delete the team
+      const result = await queryRunner.manager.delete('team', { id: teamId });
+
+      if (result.affected === 0) {
+        throw new NotFoundException('Team not found');
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -846,7 +901,7 @@ export class WorkspaceService {
 
   async updateTeamMemberRole(
     teamId: string,
-    memberId: number,
+    memberId: string,
     userId: number,
     dto: UpdateMemberRoleDto,
   ): Promise<void> {
@@ -860,8 +915,11 @@ export class WorkspaceService {
       throw new ForbiddenException('Only team owner can update member roles');
     }
 
+    // return;
+    console.log('Updating role for memberId:', memberId, 'in teamId:', teamId);
+
     const member = await this.teamMemberRepository.findOne({
-      where: { userId: memberId, teamId },
+      where: { id: memberId, teamId },
       relations: ['role'],
     });
 
@@ -895,7 +953,6 @@ export class WorkspaceService {
         throw new BadRequestException('Cannot change role of the last team owner');
       }
     }
-
     member.roleId = dto.roleId;
     await this.teamMemberRepository.save(member);
   }
