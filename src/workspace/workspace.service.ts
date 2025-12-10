@@ -634,7 +634,7 @@ export class WorkspaceService {
       const invitationExists = await this.workspaceInvitationRepository.findOne({
         where: { workspaceId, invitedEmail: dto.email },
       });
-      if (invitationExists) {
+      if (invitationExists && invitationExists.status === InvitationStatus.PENDING) {
         throw new ConflictException(
           'An invitation has already been sent to this email for this workspace',
         );
