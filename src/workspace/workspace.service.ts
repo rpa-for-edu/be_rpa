@@ -669,7 +669,9 @@ export class WorkspaceService {
     dto: UpdateWorkspaceMemberRoleDto,
   ): Promise<void> {
     await this.checkWorkspacePermission(workspaceId, userId, [WorkspaceMemberRole.OWNER]);
-
+    if (memberId === userId) {
+      throw new BadRequestException('User cannot change their own role');
+    }
     const member = await this.workspaceMemberRepository.findOne({
       where: { userId: memberId, workspaceId },
     });
