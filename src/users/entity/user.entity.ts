@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { ProcessVersion } from 'src/processes/entity/processVersions.entity';
 
 export enum AuthenticationProvider {
   GOOGLE = 'Google',
@@ -43,4 +44,7 @@ export class User {
     nullable: true,
   })
   providerId: string;
+
+  @OneToMany(() => ProcessVersion, (processVersion) => processVersion.creator)
+  processVersions: ProcessVersion[];
 }

@@ -1,3 +1,4 @@
+import { SetMetadata } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ApiResponseDto<T = any> {
@@ -42,3 +43,15 @@ export class ErrorResponseDto extends ApiResponseDto {
     });
   }
 }
+
+export const RESPONSE_WRAPPER_KEY = 'response_wrapper';
+
+export interface ResponseWrapperOptions {
+  message?: string;
+}
+
+export const ApiResponseWrapper = (options?: ResponseWrapperOptions) =>
+  SetMetadata(RESPONSE_WRAPPER_KEY, {
+    enabled: true,
+    ...options,
+  });

@@ -5,10 +5,12 @@ import {
   PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../../users/entity/user.entity';
 import { Workspace } from '../../workspace/entity/workspace.entity';
 import { Team } from '../../workspace/entity/team.entity';
+import { ProcessVersion } from './processVersions.entity';
 
 export enum ProcessScope {
   PERSONAL = 'personal',
@@ -76,4 +78,7 @@ export class Process {
 
   @ManyToOne(() => Team, { nullable: true })
   team: Team;
+
+  @OneToMany(() => ProcessVersion, (processVersion) => processVersion.process)
+  versions: ProcessVersion[];
 }
