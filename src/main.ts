@@ -5,6 +5,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ActivityPackage } from './activity-packages/schema/activity-package.schema';
 import { DocumentTemplateDetail } from './document-template/schema/document-template.schema';
 import { ProcessDetail } from './processes/schema/process.schema';
+import { ApiResponseInterceptor } from './common/interceptors/response-wrapper.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -32,6 +33,7 @@ async function bootstrap() {
 
   // Enable automatic serialization to exclude sensitive fields
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(new ApiResponseInterceptor(app.get(Reflector)));
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -1,44 +1,50 @@
-import { BadRequestException, HttpException } from "@nestjs/common";
+import { BadRequestException, HttpException } from '@nestjs/common';
 
 export class EmailAlreadyExistsException extends HttpException {
   constructor() {
-    super("Email already exists", 400);
+    super('Email already exists', 400);
   }
 }
 
 export class CannotRequestOtpException extends HttpException {
   constructor() {
-    super("Cannot request otp", 400);
+    super('Cannot request otp', 400);
   }
 }
 
 export class InvalidOtpException extends HttpException {
   constructor() {
-    super("Invalid otp", 400);
+    super('Invalid otp', 400);
   }
 }
 
 export class InvalidStateException extends HttpException {
   constructor() {
-    super("Invalid state", 400);
+    super('Invalid state', 400);
   }
 }
 
 export class UnableToCreateConnectionException extends HttpException {
   constructor() {
-    super("Unable to create connection", 400);
+    super('Unable to create connection', 400);
   }
 }
 
 export class UnableToCreateProcessException extends HttpException {
   constructor() {
-    super("Unable to create process", 400);
+    super('Unable to create process', 400);
+  }
+}
+
+export class UnableToDeleteProcessException extends HttpException {
+  constructor() {
+    super('Unable to delete process', 400);
   }
 }
 
 export class ProcessValidationFailedException extends BadRequestException {
   constructor(description: string) {
-    super("Failed to validate process", {
+    super('Failed to validate process', {
       cause: new Error(),
       description,
     });
@@ -47,42 +53,42 @@ export class ProcessValidationFailedException extends BadRequestException {
 
 export class ProcessNotFoundException extends HttpException {
   constructor() {
-    super("Process not found", 404);
+    super('Process not found', 404);
   }
 }
 
 export class DocumentTemplateNotFoundException extends HttpException {
   constructor() {
-    super("Document template not found", 404);
+    super('Document template not found', 404);
   }
 }
 
 export class ConnectionNotFoundException extends HttpException {
   constructor() {
-    super("Connection not found", 404);
+    super('Connection not found', 404);
   }
 }
 
 export class RobotNotFoundException extends HttpException {
   constructor() {
-    super("Robot not found", 404);
+    super('Robot not found', 404);
   }
 }
 
 export class UserNotFoundException extends HttpException {
   constructor() {
-    super("User not found", 404);
+    super('User not found', 404);
   }
 }
 
 export class FileTooLargeException extends HttpException {
   constructor() {
-    super("File too large", 400);
+    super('File too large', 400);
   }
 }
 
 export class CannotRefreshToken extends HttpException {
   constructor() {
-    super("Cannot refresh token", 400);
+    super('Cannot refresh token', 400);
   }
 }
