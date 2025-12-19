@@ -64,21 +64,20 @@ export class ProcessesService {
       ...createProcessDto,
       userId,
     });
-
-    const processDetail = new this.processDetailModel({
-      _id: `${userId}.${processEntity.id}`,
-      xml: createProcessDto.xml,
-      variables: {},
-      activities: [],
-    });
-
     try {
-      await processDetail.save();
+      await this.createProcessVersion(userId, {
+        processId: processEntity.id,
+        xml: createProcessDto.xml,
+        variables: {},
+        activities: [],
+        tag: 'Initial Version',
+        description: 'The first version of the process',
+      });
     } catch (error) {
-      await this.processRepository.delete(processEntity.id);
+      await this.processRepository.delete({ id: processEntity.id, userId });
       throw new UnableToCreateProcessException();
     }
-    return processDetail;
+    return processEntity;
   }
 
   async getProcess(userId: number, processId: string) {
@@ -94,7 +93,7 @@ export class ProcessesService {
       .lean()
       .exec();
     if (preProcess && !preProcess.versionId) {
-      this.createProcessVersion(userId, {
+      await this.createProcessVersion(userId, {
         processId: processId,
         xml: preProcess.xml,
         variables: preProcess.variables,
