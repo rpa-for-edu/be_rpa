@@ -142,15 +142,19 @@ export class ProcessesService {
         ...saveProcessDto,
       },
     );
-    return this.processRepository.update(
-      {
-        id: processId,
-        userId,
-      },
-      {
-        updatedAt: new Date(),
-        version: process.version + 1,
-      },
+    // return this.processRepository.update(
+    //   {
+    //     id: processId,
+    //     userId,
+    //   },
+    //   {
+    //     updatedAt: new Date(),
+    //     version: process.version + 1,
+    //   },
+    // );
+    return this.processVersionRepository.update(
+      { processId: processId, isCurrent: true },
+      { updatedAt: new Date() },
     );
   }
 
