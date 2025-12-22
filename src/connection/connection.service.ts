@@ -163,7 +163,12 @@ export class ConnectionService {
       throw new ConnectionNotFoundException();
     }
 
-    await this.revokeToken(connection.refreshToken);
+    // Only revoke OAuth2 tokens for Google providers
+    // Moodle uses token-based auth, not OAuth2
+    if (provider !== AuthorizationProvider.MOODLE) {
+      await this.revokeToken(connection.refreshToken);
+    }
+
     await this.connectionRepository.delete({
       userId,
       provider,
