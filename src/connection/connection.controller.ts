@@ -26,6 +26,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Public } from 'src/common/decorators/public.decorator';
 import { GetUserCredentialBodyDto } from './dto/robot-credentials-body.dto';
 import { GetUserCredentialWithRobotVersionBodyDto } from './dto/robot-version-credentials-body.dto';
+import { CreateMoodleConnectionDto } from './dto/create-moodle-connection.dto';
 
 @Controller('connection')
 @ApiTags('connection')
@@ -199,5 +200,107 @@ export class ConnectionController {
   async getConnectionsForRobotVersion(@Body() body: GetUserCredentialWithRobotVersionBodyDto) {
     const { userId, processId, processVersion } = body;
     return this.connectionService.getRobotConnection(userId, processId, processVersion);
+  }
+
+  @Post('/moodle')
+  @ApiOperation({ summary: 'Create Moodle connection' })
+  @ApiBody({ type: CreateMoodleConnectionDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Moodle connection created successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid Moodle credentials or connection already exists',
+  })
+  async createMoodleConnection(
+    @UserDecor() user: UserPayload,
+    @Body() createMoodleDto: CreateMoodleConnectionDto,
+  ) {
+    try {
+      const connection = await this.connectionService.createMoodleConnection(
+        user.id,
+        createMoodleDto,
+      );
+      return {
+        message: 'Moodle connection created successfully',
+        connection: {
+          provider: connection.provider,
+          name: connection.name,
+          connectionKey: connection.connectionKey,
+          createdAt: connection.createdAt,
+        },
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: error.message || 'Failed to create Moodle connection',
+        },
+        HttpStatus.BAD_REQUEST,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
+
+  @Get('/moodle/test')
+  @ApiOperation({ summary: 'Test Moodle connection' })
+  @ApiQuery({ name: 'name', description: 'Connection name', required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'Moodle connection test successful',
+  })
+  async testMoodleConnection(
+    @UserDecor() user: UserPayload,
+    @Query('name') name: string,
+  ) {
+    try {
+      const siteInfo = await this.connectionService.testMoodleConnection(user.id, name);
+      return {
+        message: 'Connection successful',
+        siteInfo,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: error.message || 'Failed to test Moodle connection',
+        },
+        HttpStatus.BAD_REQUEST,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
+
+  @Get('/moodle/credentials')
+  @ApiOperation({ summary: 'Get Moodle credentials' })
+  @ApiQuery({ name: 'name', description: 'Connection name', required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'Moodle credentials retrieved successfully',
+  })
+  async getMoodleCredentials(
+    @UserDecor() user: UserPayload,
+    @Query('name') name: string,
+  ) {
+    try {
+      const credentials = await this.connectionService.getMoodleCredentials(user.id, name);
+      return credentials;
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: error.message || 'Failed to get Moodle credentials',
+        },
+        HttpStatus.BAD_REQUEST,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 }

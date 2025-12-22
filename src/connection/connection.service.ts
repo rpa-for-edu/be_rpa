@@ -13,6 +13,8 @@ import { GoogleService } from 'src/google/google.service';
 import crypto from 'crypto';
 import { Robot } from 'src/robot/entity/robot.entity';
 import { GoogleCredentialService } from './service/google-credential.service';
+import { MoodleService } from './service/moodle.service';
+import { CreateMoodleConnectionDto } from './dto/create-moodle-connection.dto';
 import { connect } from 'http2';
 import { WhereClause } from 'typeorm/query-builder/WhereClause';
 import { CreateRobotProvider } from 'src/robot/dto/create-robot-v2.dto';
@@ -43,6 +45,7 @@ export class ConnectionService {
     readonly configService: ConfigService,
     private googleService: GoogleService,
     private googleCredentialService: GoogleCredentialService,
+    private moodleService: MoodleService,
   ) {}
 
   async createConnection(
@@ -346,5 +349,92 @@ export class ConnectionService {
     });
     robotConnection.isActivate = status;
     await this.robotConnectionRepository.save(robotConnection);
+  }
+
+  /**
+   * Create Moodle connection
+   * Moodle uses token-based authentication, not OAuth2
+   */
+  async createMoodleConnection(
+    userId: number,
+    createMoodleDto: CreateMoodleConnectionDto,
+  ): Promise<Connection> {
+    // Verify Moodle connection
+    const isValid = await this.moodleService.verifyConnection({
+      baseUrl: createMoodleDto.baseUrl,
+      token: createMoodleDto.token,
+    });
+
+    if (!isValid) {
+      throw new BadRequestException('Invalid Moodle credentials or connection failed');
+    }
+
+    // Get site info to use as connection name if not provided
+    let connectionName = createMoodleDto.name;
+    if (!connectionName) {
+      try {
+        const siteInfo = await this.moodleService.getSiteInfo({
+          baseUrl: createMoodleDto.baseUrl,
+          token: createMoodleDto.token,
+        });
+        connectionName = siteInfo.sitename || createMoodleDto.baseUrl;
+      } catch (error) {
+        connectionName = createMoodleDto.baseUrl;
+      }
+    }
+
+    // Check if connection already exists
+    const existingConnection = await this.connectionRepository.findOneBy({
+      provider: AuthorizationProvider.MOODLE,
+      userId,
+      name: connectionName,
+    });
+
+    if (existingConnection) {
+      throw new UnableToCreateConnectionException();
+    }
+
+    // Store Moodle credentials
+    // For Moodle, we store baseUrl in accessToken and token in refreshToken
+    const connection = await this.connectionRepository.save({
+      provider: AuthorizationProvider.MOODLE,
+      userId,
+      name: connectionName,
+      accessToken: createMoodleDto.baseUrl,
+      refreshToken: createMoodleDto.token,
+    });
+
+    return connection;
+  }
+
+  /**
+   * Get Moodle connection credentials
+   */
+  async getMoodleCredentials(
+    userId: number,
+    connectionName: string,
+  ): Promise<{ baseUrl: string; token: string }> {
+    const connection = await this.connectionRepository.findOneBy({
+      userId,
+      provider: AuthorizationProvider.MOODLE,
+      name: connectionName,
+    });
+
+    if (!connection) {
+      throw new ConnectionNotFoundException();
+    }
+
+    return {
+      baseUrl: connection.accessToken,
+      token: connection.refreshToken,
+    };
+  }
+
+  /**
+   * Test Moodle connection
+   */
+  async testMoodleConnection(userId: number, connectionName: string): Promise<any> {
+    const credentials = await this.getMoodleCredentials(userId, connectionName);
+    return this.moodleService.getSiteInfo(credentials);
   }
 }
