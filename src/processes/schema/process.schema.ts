@@ -38,6 +38,18 @@ export class ProcessDetail extends Document {
     required: true,
     type: String,
   })
+  versionId: string;
+
+  @Prop({
+    required: true,
+    type: String,
+  })
+  processId: string;
+
+  @Prop({
+    required: true,
+    type: String,
+  })
   xml: string;
 
   @Prop({
