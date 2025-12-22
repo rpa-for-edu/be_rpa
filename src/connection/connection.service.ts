@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   UnableToCreateConnectionException,
@@ -35,6 +35,8 @@ export interface CreateConnectionDto {
 
 @Injectable()
 export class ConnectionService {
+  private readonly logger = new Logger(ConnectionService.name);
+
   constructor(
     @InjectRepository(Connection)
     private connectionRepository: Repository<Connection>,
@@ -138,6 +140,22 @@ export class ConnectionService {
       throw new ConnectionNotFoundException();
     }
 
+    // Only Google providers use OAuth2 refresh tokens
+    const googleProviders = [
+      AuthorizationProvider.G_DRIVE,
+      AuthorizationProvider.G_SHEETS,
+      AuthorizationProvider.G_GMAIL,
+      AuthorizationProvider.G_DOCS,
+      AuthorizationProvider.G_CLASSROOM,
+      AuthorizationProvider.G_FORMS,
+    ];
+
+    if (!googleProviders.includes(provider)) {
+      throw new BadRequestException(
+        `Refresh token is not supported for ${provider}. This provider uses token-based authentication.`
+      );
+    }
+
     const oauth2Client = this.googleService.getOAuth2Client(provider);
     oauth2Client.setCredentials({
       access_token: connection.accessToken,
@@ -179,13 +197,18 @@ export class ConnectionService {
   private async revokeToken(refreshToken: string) {
     const url = `https://oauth2.googleapis.com/revoke?token=${refreshToken}`;
 
-    const res = await axios.post(url, null, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
-
-    return res;
+    try {
+      const res = await axios.post(url, null, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+      return res;
+    } catch (error) {
+      // Log error but don't throw - allow connection deletion to proceed
+      this.logger.error(`Failed to revoke token: ${error.message}`);
+      return null;
+    }
   }
 
   async getConnectionByProviders(userId: number, providers: AuthorizationProvider[]) {
