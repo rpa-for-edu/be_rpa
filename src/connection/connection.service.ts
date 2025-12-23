@@ -268,10 +268,25 @@ export class ConnectionService {
       },
       relations: ['connection'],
     });
-    let connections = robotConnectionsMapping.map((conn) => ({
-      fileName: ConnectionService.getCredentialFileName(conn.connectionKey),
-      data: this.googleCredentialService.create(conn.connection),
-    }));
+    let connections = robotConnectionsMapping.map((conn) => {
+      let credentialData;
+      
+      // Special handling for Moodle
+      if (conn.connection.provider === AuthorizationProvider.MOODLE) {
+        credentialData = {
+          access_token: conn.connection.accessToken,  // baseUrl
+          refresh_token: conn.connection.refreshToken, // Moodle token
+        };
+      } else {
+        // All other providers use GoogleCredentialService
+        credentialData = this.googleCredentialService.create(conn.connection);
+      }
+
+      return {
+        fileName: ConnectionService.getCredentialFileName(conn.connectionKey),
+        data: credentialData,
+      };
+    });
     return connections;
   }
 
