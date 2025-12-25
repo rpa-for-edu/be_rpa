@@ -290,12 +290,40 @@ export class ProcessesService {
           version: process.version + 1,
         },
       );
-      return processVersionEntity;
+      return { processVersionEntity, version: process.version + 1 };
     } catch (error) {
       console.error(error);
       await this.processVersionRepository.delete(processVersionEntity.id);
       throw new UnableToCreateProcessException();
     }
+  }
+
+  async createProcessVersionFromCurrent(
+    userId: number,
+    processId: string,
+    tag: string,
+    description: string,
+  ) {
+    const process = await this.processRepository.findOne({
+      where: { id: processId, userId },
+    });
+    if (!process) {
+      throw new ProcessNotFoundException();
+    }
+    const currentVersionDetail = await this.processDetailModel.findOne({
+      _id: `${userId}.${process.id}.${process.version}`,
+    });
+    if (!currentVersionDetail) {
+      throw new ProcessNotFoundException();
+    }
+    return this.createProcessVersion(userId, {
+      processId: processId,
+      xml: currentVersionDetail.xml,
+      variables: currentVersionDetail.variables,
+      activities: currentVersionDetail.activities,
+      tag: tag,
+      description: description,
+    });
   }
 
   async restoreProcessVersion(userId: number, processId: string, versionId: string) {
