@@ -60,6 +60,12 @@ export class RobotService {
 
   async createRobot(userId: number, createRobotDto: CreateRobotDtoV2) {
     const providers = createRobotDto.providers;
+    const { version } = await this.processService.createProcessVersionFromCurrent(
+      userId,
+      createRobotDto.processId,
+      'Publish Robot Version',
+      'Automated version created when robot is created',
+    );
     const process = await this.processRepository.findOne({
       where: { id: createRobotDto.processId, userId },
     });
@@ -91,24 +97,18 @@ export class RobotService {
     userId: number,
   ): Promise<Robot> {
     try {
-      const { version } = await this.processService.createProcessVersionFromCurrent(
-        userId,
-        process.id,
-        'Publish Robot Version',
-        'Automated version created when robot is created',
-      );
       // Create Robot
       await this.robotRepository.save({
         ...createRobotDto,
         userId,
-        processVersion: version,
+        processVersion: process.version,
       });
 
       return await this.robotRepository.findOne({
         where: {
           userId: userId,
           processId: process.id,
-          processVersion: version,
+          processVersion: process.version,
         },
       });
     } catch (error) {
