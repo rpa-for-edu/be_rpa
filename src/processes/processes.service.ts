@@ -21,6 +21,7 @@ import { NotificationType } from 'src/notification/entity/notification.entity';
 import { CreateProcessVersionDto } from './dto/create-process-version.dto';
 import { ProcessVersion } from './entity/processVersions.entity';
 import { ProcessDetailVersionResponse } from './dto/processdetailversion.response';
+import { CreateProcessAllParamsDto } from './dto/create-process-allParams.dto';
 
 @Injectable()
 export class ProcessesService {
@@ -249,7 +250,26 @@ export class ProcessesService {
       .andWhere('process.userId != :userId', { userId })
       .getMany();
   }
-
+  async createProcessAllParams(createProcessAllParams: CreateProcessAllParamsDto, userId: number) {
+    const processEntity = await this.processRepository.save({
+      ...createProcessAllParams,
+      userId,
+    });
+    try {
+      await this.createProcessVersion(userId, {
+        processId: processEntity.id,
+        xml: createProcessAllParams.xml,
+        variables: createProcessAllParams.variables,
+        activities: createProcessAllParams.activities,
+        tag: 'Initial Version',
+        description: 'The first version of the process',
+      });
+    } catch (error) {
+      await this.processRepository.delete({ id: processEntity.id, userId });
+      throw new UnableToCreateProcessException();
+    }
+    return processEntity;
+  }
   //! ===== PROCESS VERSION =====!//
   async createProcessVersion(userId: number, createProcessVersionDto: CreateProcessVersionDto) {
     const process = await this.processRepository.findOne({

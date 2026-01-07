@@ -16,6 +16,7 @@ import { SaveProcessDto } from './dto/save-process.dto';
 import { ProcessDetail } from './schema/process.schema';
 import { CreateProcessVersionDto } from './dto/create-process-version.dto';
 import { ApiResponseWrapper } from 'src/common/dto/api-response.dto';
+import { CreateProcessAllParamsDto } from './dto/create-process-allParams.dto';
 
 @Controller('processes')
 @ApiTags('processes')
@@ -43,7 +44,13 @@ export class ProcessesController {
   async createProcess(@UserDecor() user: UserPayload, @Body() createProcessDto: CreateProcessDto) {
     return await this.processesService.createProcess(user.id, createProcessDto);
   }
-
+  @Post('/all-params')
+  async createProcessAllParams(
+    @UserDecor() user: UserPayload,
+    @Body() createProcessAllParams: CreateProcessAllParamsDto,
+  ) {
+    return await this.processesService.createProcessAllParams(createProcessAllParams, user.id);
+  }
   @Get('/:id')
   @ApiResponse({
     status: 200,
