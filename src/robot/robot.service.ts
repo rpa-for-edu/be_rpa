@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConnectionService } from 'src/connection/connection.service';
 import { CreateRobotDtoV2 } from './dto/create-robot-v2.dto';
 import axios from 'axios';
+import { ProcessesService } from 'src/processes/processes.service';
 
 @Injectable()
 export class RobotService {
@@ -20,6 +21,7 @@ export class RobotService {
     private robotRepository: Repository<Robot>,
     @InjectRepository(Process)
     private processRepository: Repository<Process>,
+    private processService: ProcessesService,
     private connectionService: ConnectionService,
     private configService: ConfigService,
   ) {
@@ -58,6 +60,12 @@ export class RobotService {
 
   async createRobot(userId: number, createRobotDto: CreateRobotDtoV2) {
     const providers = createRobotDto.providers;
+    const { version } = await this.processService.createProcessVersionFromCurrent(
+      userId,
+      createRobotDto.processId,
+      'Publish Robot Version',
+      'Automated version created when robot is created',
+    );
     const process = await this.processRepository.findOne({
       where: { id: createRobotDto.processId, userId },
     });

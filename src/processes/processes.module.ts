@@ -24,5 +24,6 @@ import { ProcessVersion } from './entity/processVersions.entity';
   ],
   providers: [ProcessesService, ProcessesValidateService],
   controllers: [ProcessesController],
+  exports: [ProcessesService],
 })
 export class ProcessesModule {}
