@@ -6,3 +6,4 @@ export * from './workspace-member.entity';
 export * from './team-member.entity';
 export * from './team-invitation.entity';
 export * from './workspace-invitation.entity';
+export * from './workspace-connection.entity';

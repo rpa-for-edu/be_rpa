@@ -22,6 +22,7 @@ import { HeaderApiKeyStrategy } from './strategy/api-key.stategy';
 import { SAPMockStrategy } from './strategy/sap-mock.strategy';
 import { ErpNextOAuthGuard } from './guard/erpnext-oauth.guard';
 import { ErpNextOAuthStrategy } from './strategy/erpnext-oauth.strategy';
+import { WorkspaceModule } from 'src/workspace/workspace.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ErpNextOAuthStrategy } from './strategy/erpnext-oauth.strategy';
     PassportModule,
     EmailModule,
     ConnectionModule,
+    WorkspaceModule,
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),

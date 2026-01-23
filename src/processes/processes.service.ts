@@ -54,6 +54,8 @@ export class ProcessesService {
       .createQueryBuilder('process')
       .leftJoinAndSelect('process.sharedByUser', 'user', 'user.id = process.sharedByUserId')
       .where('process.userId = :userId', { userId })
+      .andWhere('process.workspaceId IS NULL')
+      .andWhere('process.teamId IS NULL')
       .orderBy('process.updatedAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)

@@ -19,6 +19,7 @@ import { EmailService } from 'src/email/email.service';
 import { ResendOtpDto, VerifyOtpDto } from './dto/otp.dto';
 import { ConnectionService, UserTokenFromProvider } from 'src/connection/connection.service';
 import { AuthorizationProvider } from 'src/connection/entity/connection.entity';
+import { WorkspaceConnectionsService } from 'src/workspace/workspace-connections.service';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
     private jwtService: JwtService,
     private emailService: EmailService,
     private connectionSerivce: ConnectionService,
+    private workspaceConnectionsService: WorkspaceConnectionsService,
     @InjectModel(Otp.name) private otpModel: Model<Otp>,
   ) {}
 
@@ -191,5 +193,63 @@ export class AuthService {
     await this.checkIfCanRequestOtp(email, 'update');
 
     await this.otpModel.updateOne({ email }, { code: otpCode, createdAt: new Date() });
+  }
+
+  async authorizeWorkspaceFromProvider(
+    userToken: UserTokenFromProvider,
+    state: string,
+    provider: AuthorizationProvider,
+  ) {
+    let workspaceId: string;
+    let fromUser: number;
+    let reconnect: boolean;
+    
+    try {
+      const obj = JSON.parse(state);
+      workspaceId = obj.workspaceId;
+      fromUser = parseInt(obj.fromUser);
+      reconnect = obj.reconnect || false;
+      
+      if (!workspaceId || !fromUser || Number.isNaN(fromUser)) {
+        console.error('Invalid state:', { workspaceId, fromUser, reconnect });
+        throw new Error('Invalid state parameters');
+      }
+    } catch (error) {
+      console.error('Failed to parse state:', error);
+      throw new InvalidStateException();
+    }
+
+    const { accessToken, refreshToken, profile } = userToken;
+    const email = profile?.emails?.[0].value || profile?.displayName || 'Unknown';
+
+    console.log('Creating workspace connection:', {
+      workspaceId,
+      fromUser,
+      provider,
+      email,
+    });
+
+    try {
+      // Create workspace connection
+      const connection = await this.workspaceConnectionsService.createConnection(
+        workspaceId,
+        fromUser,
+        {
+          name: email,
+          provider,
+          accessToken,
+          refreshToken,
+        },
+      );
+      
+      console.log('Workspace connection created successfully:', {
+        provider: connection.provider,
+        name: connection.name,
+        connectionKey: connection.connectionKey,
+      });
+    } catch (error) {
+      console.error('Failed to create workspace connection:', error);
+      throw error;
+    }
   }
 }

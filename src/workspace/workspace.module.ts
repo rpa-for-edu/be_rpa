@@ -7,7 +7,9 @@ import { WorkspaceProcessesController } from './workspace-processes.controller';
 import { WorkspaceProcessesService } from './workspace-processes.service';
 import { WorkspaceRobotsController } from './workspace-robots.controller';
 import { WorkspaceRobotsService } from './workspace-robots.service';
-import { WorkspaceCollaborationGateway } from './workspace-collaboration.gateway';
+import { WorkspaceConnectionsController } from './workspace-connections.controller';
+import { WorkspaceConnectionsService } from './workspace-connections.service';
+// import { WorkspaceCollaborationGateway } from './workspace-collaboration.gateway';
 import {
   Workspace,
   Team,
@@ -17,6 +19,7 @@ import {
   TeamMember,
   TeamInvitation,
   WorkspaceInvitation,
+  WorkspaceConnection,
 } from './entity';
 import { NotificationModule } from 'src/notification/notification.module';
 import {
@@ -32,6 +35,7 @@ import { ProcessDetail, ProcessDetailSchema } from 'src/processes/schema/process
 import { Robot } from 'src/robot/entity/robot.entity';
 import { UsersModule } from 'src/users/users.module';
 import { ConnectionModule } from 'src/connection/connection.module';
+import { GoogleModule } from 'src/google/google.module';
 
 @Module({
   imports: [
@@ -44,6 +48,7 @@ import { ConnectionModule } from 'src/connection/connection.module';
       TeamMember,
       TeamInvitation,
       WorkspaceInvitation,
+      WorkspaceConnection,
       ActivityTemplate,
       ActivityPackage,
       ActivityPackageAccess,
@@ -57,15 +62,22 @@ import { ConnectionModule } from 'src/connection/connection.module';
     NotificationModule,
     UsersModule,
     ConnectionModule,
+    GoogleModule,
   ],
-  controllers: [WorkspaceController, WorkspaceProcessesController, WorkspaceRobotsController],
+  controllers: [
+    WorkspaceController,
+    WorkspaceProcessesController,
+    WorkspaceRobotsController,
+    WorkspaceConnectionsController,
+  ],
   providers: [
     WorkspaceService,
     WorkspaceProcessesService,
     WorkspaceRobotsService,
-    WorkspaceCollaborationGateway,
+    WorkspaceConnectionsService,
+    // WorkspaceCollaborationGateway,
   ],
-  exports: [WorkspaceService, TypeOrmModule],
+  exports: [WorkspaceService, WorkspaceConnectionsService, TypeOrmModule],
 })
 export class WorkspaceModule {}
 

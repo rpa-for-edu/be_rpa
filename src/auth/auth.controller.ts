@@ -343,4 +343,139 @@ export class AuthController {
       }&message=${message}`,
     );
   }
+
+  // ==================== WORKSPACE OAUTH ENDPOINTS ====================
+
+  @Get('workspace/:workspaceId/drive')
+  @UseGuards(GoogleDriveOauthGuard)
+  @ApiOAuth2(['https://www.googleapis.com/auth/drive'])
+  async workspaceGoogleDriveAuth() {}
+
+  @Get('workspace/:workspaceId/drive/callback')
+  @UseFilters(HttpExceptionRedirectISFilter)
+  @UseGuards(GoogleDriveOauthGuard)
+  async workspaceGoogleDriveAuthRedirect(
+    @UserDecor() userToken: UserTokenFromProvider,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    await this.authService.authorizeWorkspaceFromProvider(
+      userToken,
+      state,
+      AuthorizationProvider.G_DRIVE,
+    );
+    const { workspaceId } = JSON.parse(state);
+    const message = 'Authorized Google Drive successfully!';
+    res.redirect(
+      `${this.configService.get('FRONTEND_URL')}/workspace/${workspaceId}/connections?provider=${
+        AuthorizationProvider.G_DRIVE
+      }&message=${message}`,
+    );
+  }
+
+  @Get('workspace/:workspaceId/sheets')
+  @UseGuards(GoogleSheetsOauthGuard)
+  @ApiOAuth2(['https://www.googleapis.com/auth/spreadsheets'])
+  async workspaceGoogleSheetsAuth() {}
+
+  @Get('workspace/:workspaceId/sheets/callback')
+  @UseFilters(HttpExceptionRedirectISFilter)
+  @UseGuards(GoogleSheetsOauthGuard)
+  async workspaceGoogleSheetsAuthRedirect(
+    @UserDecor() userToken: UserTokenFromProvider,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    await this.authService.authorizeWorkspaceFromProvider(
+      userToken,
+      state,
+      AuthorizationProvider.G_SHEETS,
+    );
+    const { workspaceId } = JSON.parse(state);
+    const message = 'Authorized Google Sheets successfully!';
+    res.redirect(
+      `${this.configService.get('FRONTEND_URL')}/workspace/${workspaceId}/connections?provider=${
+        AuthorizationProvider.G_SHEETS
+      }&message=${message}`,
+    );
+  }
+
+  @Get('workspace/:workspaceId/gmail')
+  @UseGuards(GmailOauthGuard)
+  @ApiOAuth2(['https://mail.google.com/'])
+  async workspaceGmailAuth() {}
+
+  @Get('workspace/:workspaceId/gmail/callback')
+  @UseFilters(HttpExceptionRedirectISFilter)
+  @UseGuards(GmailOauthGuard)
+  async workspaceGmailAuthRedirect(
+    @UserDecor() userToken: UserTokenFromProvider,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    await this.authService.authorizeWorkspaceFromProvider(
+      userToken,
+      decodeURIComponent(state as string),
+      AuthorizationProvider.G_GMAIL,
+    );
+    const { workspaceId } = JSON.parse(decodeURIComponent(state as string));
+    const message = 'Authorized Gmail successfully!';
+    res.redirect(
+      `${this.configService.get('FRONTEND_URL')}/workspace/${workspaceId}/connections?provider=${
+        AuthorizationProvider.G_GMAIL
+      }&message=${message}`,
+    );
+  }
+
+  @Get('workspace/:workspaceId/classroom')
+  @UseGuards(GoogleClassroomOauthGuard)
+  async workspaceGoogleClassroomAuth() {}
+
+  @Get('workspace/:workspaceId/classroom/callback')
+  @UseFilters(HttpExceptionRedirectISFilter)
+  @UseGuards(GoogleClassroomOauthGuard)
+  async workspaceGoogleClassroomAuthRedirect(
+    @UserDecor() userToken: UserTokenFromProvider,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    await this.authService.authorizeWorkspaceFromProvider(
+      userToken,
+      state,
+      AuthorizationProvider.G_CLASSROOM,
+    );
+    const { workspaceId } = JSON.parse(state);
+    const message = 'Authenticated with Google Classroom successfully!';
+    res.redirect(
+      `${this.configService.get('FRONTEND_URL')}/workspace/${workspaceId}/connections?provider=${
+        AuthorizationProvider.G_CLASSROOM
+      }&message=${message}`,
+    );
+  }
+
+  @Get('workspace/:workspaceId/forms')
+  @UseGuards(GoogleFormsOauthGuard)
+  async workspaceGoogleFormsAuth() {}
+
+  @Get('workspace/:workspaceId/forms/callback')
+  @UseFilters(HttpExceptionRedirectISFilter)
+  @UseGuards(GoogleFormsOauthGuard)
+  async workspaceGoogleFormsAuthRedirect(
+    @UserDecor() userToken: UserTokenFromProvider,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    await this.authService.authorizeWorkspaceFromProvider(
+      userToken,
+      state,
+      AuthorizationProvider.G_FORMS,
+    );
+    const { workspaceId } = JSON.parse(state);
+    const message = 'Authorized Google Forms successfully!';
+    res.redirect(
+      `${this.configService.get('FRONTEND_URL')}/workspace/${workspaceId}/connections?provider=${
+        AuthorizationProvider.G_FORMS
+      }&message=${message}`,
+    );
+  }
 }

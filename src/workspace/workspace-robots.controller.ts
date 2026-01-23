@@ -32,7 +32,7 @@ export class WorkspaceRobotsController {
   constructor(private readonly workspaceRobotsService: WorkspaceRobotsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all robots in workspace' })
+  @ApiOperation({ summary: 'Get robots in workspace' })
   @ApiParam({ name: 'workspaceId', type: 'string' })
   @ApiQuery({ name: 'limit', required: true, type: 'number' })
   @ApiQuery({ name: 'page', required: true, type: 'number' })
