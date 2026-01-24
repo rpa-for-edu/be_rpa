@@ -22,15 +22,18 @@ import { CreateProcessVersionDto } from './dto/create-process-version.dto';
 import { ProcessVersion } from './entity/processVersions.entity';
 import { ProcessDetailVersionResponse } from './dto/processdetailversion.response';
 import { CreateProcessAllParamsDto } from './dto/create-process-allParams.dto';
+import { CommentEntity } from './entity/comment.entity';
+import { AddCommentToElementDto } from './dto/addCommentToElement.dto';
 
 @Injectable()
 export class ProcessesService {
   constructor(
-    private dataSource: DataSource,
     @InjectRepository(Process)
     private processRepository: Repository<Process>,
     @InjectRepository(ProcessVersion)
     private processVersionRepository: Repository<ProcessVersion>,
+    @InjectRepository(CommentEntity)
+    private commentRepository: Repository<CommentEntity>,
     @InjectModel(ProcessDetail.name)
     private processDetailModel: Model<ProcessDetail>,
     private readonly processesValidateService: ProcessesValidateService,
@@ -462,5 +465,45 @@ export class ProcessesService {
     } catch (error) {
       throw new UnableToDeleteProcessException();
     }
+  }
+
+  //! ===== COMMENTS =====!//
+  async addCommentToElement(userId: number, addCommentToElementDto: AddCommentToElementDto) {
+    const process = await this.processRepository.findOne({
+      where: { id: addCommentToElementDto.processId, userId },
+    });
+    if (!process) {
+      throw new ProcessNotFoundException();
+    }
+    const processVersion = await this.processVersionRepository.findOne({
+      where: { processId: addCommentToElementDto.processId, isCurrent: true },
+    });
+
+    const commentEntity = await this.commentRepository.save({
+      commentText: addCommentToElementDto.commentText,
+      user_id: userId,
+      process_id: addCommentToElementDto.processId,
+      process_version_id: processVersion.id,
+      node_id: addCommentToElementDto.elementId,
+      createdAt: new Date(),
+    });
+    return commentEntity;
+  }
+
+  async getCommentsOfProcess(userId: number, processId: string) {
+    const process = await this.processRepository.findOne({
+      where: { id: processId, userId },
+    });
+
+    if (!process) {
+      throw new ProcessNotFoundException();
+    }
+
+    return this.commentRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user', 'user.id = comment.user_id')
+      .where('comment.process_id = :processId', { processId })
+      .orderBy('comment.createdAt', 'ASC')
+      .getMany();
   }
 }

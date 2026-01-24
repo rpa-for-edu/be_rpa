@@ -12,17 +12,19 @@ import { UsersModule } from 'src/users/users.module';
 import { NotificationModule } from 'src/notification/notification.module';
 
 import { ProcessVersion } from './entity/processVersions.entity';
+import { CommentEntity } from './entity/comment.entity';
+import { ProcessCommentsGateway } from './gateway/process-comments.gateway';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Process, ProcessVersion]),
+    TypeOrmModule.forFeature([Process, ProcessVersion, CommentEntity]),
     MongooseModule.forFeature([{ name: ProcessDetail.name, schema: ProcessDetailSchema }]),
     ConnectionModule,
     ActivityPackagesModule,
     UsersModule,
     NotificationModule,
   ],
-  providers: [ProcessesService, ProcessesValidateService],
+  providers: [ProcessesService, ProcessesValidateService, ProcessCommentsGateway],
   controllers: [ProcessesController],
   exports: [ProcessesService],
 })
