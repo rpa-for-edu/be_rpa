@@ -261,7 +261,7 @@ export class WorkspaceRobotsService {
       throw new RobotNotFoundException();
     }
 
-    // TODO: Check if robot is already running
+    // TODO : Check if robot is already running
     // This would require checking EC2 instance state or a status field
 
     // Call serverless function to start robot

@@ -953,7 +953,10 @@ export class WorkspaceService {
         throw new BadRequestException('Cannot change role of the last team owner');
       }
     }
+
+    // Update member role
     member.roleId = dto.roleId;
+    member.role = role;
     await this.teamMemberRepository.save(member);
   }
 
