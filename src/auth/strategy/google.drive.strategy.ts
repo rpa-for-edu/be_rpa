@@ -33,7 +33,15 @@ export class GoogleDriveStrategy extends PassportStrategy(Strategy, 'google-driv
     options?: any,
   ): void {
     const { fromUser, reconnect } = req.query;
-    const state = fromUser ? JSON.stringify({ fromUser, reconnect }) : undefined;
+    const { workspaceId } = req.params;
+    
+    // If workspaceId exists, this is a workspace OAuth flow
+    const state = workspaceId
+      ? JSON.stringify({ workspaceId, fromUser, reconnect })
+      : fromUser
+      ? JSON.stringify({ fromUser, reconnect })
+      : undefined;
+    
     super.authenticate(req, { ...options, state });
   }
 
