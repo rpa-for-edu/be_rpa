@@ -48,6 +48,7 @@ export class ProcessCommentsGateway {
       client.data.userId,
       addCommentDto,
     );
+    console.log('Comment created:', dto);
     const returnComment = {
       id: comment.id,
       process_id: comment.process_id,
@@ -57,9 +58,9 @@ export class ProcessCommentsGateway {
       process_version_id: comment.process_version_id,
       user: {
         id: dto.userId,
-        name: dto.name,
-        avatarUrl: dto.avatarUrl,
-        email: dto.email,
+        name: dto.userName,
+        avatarUrl: dto.userAvatar,
+        email: dto.userEmail,
       },
     };
     this.server.to(this.room(dto.processId)).emit('commentAdded', returnComment);

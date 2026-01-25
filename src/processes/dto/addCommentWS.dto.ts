@@ -6,9 +6,9 @@ export class AddCommentWSDto extends PartialType(AddCommentToElementDto) {
   @IsString()
   userId: string;
   @IsString()
-  name: string;
+  userName: string;
   @IsString()
-  avatarUrl: string;
+  userAvatar: string;
   @IsString()
-  email: string;
+  userEmail: string;
 }
