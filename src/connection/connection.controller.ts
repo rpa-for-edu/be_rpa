@@ -21,6 +21,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBody,
+  ApiSecurity,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from 'src/common/decorators/public.decorator';
@@ -198,6 +199,7 @@ export class ConnectionController {
   @Post('/for-robot/version')
   @Public()
   @UseGuards(AuthGuard('api-key'))
+  @ApiSecurity('Service-Key')
   async getConnectionsForRobotVersion(@Body() body: GetUserCredentialWithRobotVersionBodyDto) {
     const { userId, processId, processVersion } = body;
     return this.connectionService.getRobotConnection(userId, processId, processVersion);
