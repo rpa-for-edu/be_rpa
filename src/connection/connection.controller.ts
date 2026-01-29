@@ -276,6 +276,33 @@ export class ConnectionController {
     }
   }
 
+  @Get('/erpnext/test')
+  @ApiOperation({ summary: 'Test ERPNext connection' })
+  @ApiQuery({ name: 'name', description: 'Connection name', required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'ERPNext connection test status',
+  })
+  async testERPNextConnection(
+    @UserDecor() user: UserPayload,
+    @Query('name') name: string,
+  ) {
+    try {
+      return await this.connectionService.testERPNextConnection(user.id, name);
+    } catch (error) {
+       throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: error.message || 'Failed to test ERPNext connection',
+        },
+        HttpStatus.BAD_REQUEST,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
+
   @Get('/moodle/credentials')
   @ApiOperation({ summary: 'Get Moodle credentials' })
   @ApiQuery({ name: 'name', description: 'Connection name', required: true })

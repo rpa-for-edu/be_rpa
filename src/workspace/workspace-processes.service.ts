@@ -76,6 +76,7 @@ export class WorkspaceProcessesService {
       .leftJoinAndSelect('process.user', 'user')
       .leftJoinAndSelect('process.sharedByUser', 'sharedByUser')
       .where('process.workspaceId = :workspaceId', { workspaceId })
+      .andWhere('process.teamId IS NULL')
       .orderBy('process.updatedAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
@@ -89,7 +90,10 @@ export class WorkspaceProcessesService {
     await this.verifyWorkspaceAccess(workspaceId, userId);
 
     return this.processRepository.count({
-      where: { workspaceId },
+      where: {
+        workspaceId,
+        teamId: null,
+      },
     });
   }
 

@@ -480,4 +480,43 @@ export class ConnectionService {
     const credentials = await this.getMoodleCredentials(userId, connectionName);
     return this.moodleService.getSiteInfo(credentials);
   }
+
+  /**
+   * Test ERPNext connection
+   */
+  async testERPNextConnection(userId: number, connectionName: string): Promise<{ message: string; isValid: boolean }> {
+    const connection = await this.connectionRepository.findOneBy({
+      userId,
+      provider: AuthorizationProvider.ERP_Next,
+      name: connectionName,
+    });
+
+    if (!connection) {
+      return {
+        message: 'Connection not found',
+        isValid: false,
+      };
+    }
+
+    try {
+      const ERP_BASE_URL = this.configService.get<string>('ERP_BASE_URL');
+      // Verify token by calling a simple endpoint
+      await axios.get(`${ERP_BASE_URL}/api/method/frappe.auth.get_logged_user`, {
+        headers: {
+          Authorization: `Bearer ${connection.accessToken}`,
+        },
+      });
+      
+      return {
+        message: 'Connection successful',
+        isValid: true,
+      };
+    } catch (error) {
+      this.logger.error(`ERPNext test failed: ${error.message}`);
+      return {
+        message: 'Connection failed or invalid token',
+        isValid: false,
+      };
+    }
+  }
 }
