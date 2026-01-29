@@ -27,6 +27,7 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { GetUserCredentialBodyDto } from './dto/robot-credentials-body.dto';
 import { GetUserCredentialWithRobotVersionBodyDto } from './dto/robot-version-credentials-body.dto';
 import { CreateMoodleConnectionDto } from './dto/create-moodle-connection.dto';
+import { CreateERPNextConnectionDto } from './dto/create-erpnext-connection.dto';
 
 @Controller('connection')
 @ApiTags('connection')
@@ -294,6 +295,49 @@ export class ConnectionController {
         {
           status: HttpStatus.BAD_REQUEST,
           error: error.message || 'Failed to test ERPNext connection',
+        },
+        HttpStatus.BAD_REQUEST,
+        {
+          cause: error,
+        },
+      );
+    }
+  }
+
+  @Post('/erpnext')
+  @ApiOperation({ summary: 'Create ERPNext connection' })
+  @ApiBody({ type: CreateERPNextConnectionDto })
+  @ApiResponse({
+    status: 201,
+    description: 'ERPNext connection created successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid ERPNext credentials or connection already exists',
+  })
+  async createERPNextConnection(
+    @UserDecor() user: UserPayload,
+    @Body() body: CreateERPNextConnectionDto,
+  ) {
+    try {
+      const connection = await this.connectionService.createERPNextConnection(
+        user.id,
+        body,
+      );
+      return {
+        message: 'ERPNext connection created successfully',
+        connection: {
+          provider: connection.provider,
+          name: connection.name,
+          connectionKey: connection.connectionKey,
+          createdAt: connection.createdAt,
+        },
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: error.message || 'Failed to create ERPNext connection',
         },
         HttpStatus.BAD_REQUEST,
         {

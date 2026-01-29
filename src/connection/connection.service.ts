@@ -15,6 +15,7 @@ import { Robot } from 'src/robot/entity/robot.entity';
 import { GoogleCredentialService } from './service/google-credential.service';
 import { MoodleService } from './service/moodle.service';
 import { CreateMoodleConnectionDto } from './dto/create-moodle-connection.dto';
+import { CreateERPNextConnectionDto } from './dto/create-erpnext-connection.dto';
 import { connect } from 'http2';
 import { WhereClause } from 'typeorm/query-builder/WhereClause';
 import { CreateRobotProvider } from 'src/robot/dto/create-robot-v2.dto';
@@ -278,11 +279,14 @@ export class ConnectionService {
     let connections = robotConnectionsMapping.map((conn) => {
       let credentialData;
       
-      // Special handling for Moodle
-      if (conn.connection.provider === AuthorizationProvider.MOODLE) {
+      // Special handling for Moodle and ERPNext
+      if (
+        conn.connection.provider === AuthorizationProvider.MOODLE ||
+        conn.connection.provider === AuthorizationProvider.ERP_Next
+      ) {
         credentialData = {
-          access_token: conn.connection.accessToken,  // baseUrl
-          refresh_token: conn.connection.refreshToken, // Moodle token
+          access_token: conn.connection.accessToken, // baseUrl
+          refresh_token: conn.connection.refreshToken, // Moodle/ERPNext token
         };
       } else {
         // All other providers use GoogleCredentialService
@@ -491,7 +495,60 @@ export class ConnectionService {
   /**
    * Test ERPNext connection
    */
-  async testERPNextConnection(userId: number, connectionName: string): Promise<{ message: string; isValid: boolean }> {
+  /**
+   * Create ERPNext connection
+   */
+  async createERPNextConnection(
+    userId: number,
+    createERPNextDto: CreateERPNextConnectionDto,
+  ): Promise<Connection> {
+    // Verify ERPNext connection
+    try {
+      await axios.get(`${createERPNextDto.baseUrl}/api/method/frappe.auth.get_logged_user`, {
+        headers: {
+          Authorization: `token ${createERPNextDto.token}`,
+        },
+      });
+    } catch (error) {
+      this.logger.error(`ERPNext verification failed: ${error.message}`);
+      throw new BadRequestException('Invalid ERPNext credentials or connection failed');
+    }
+
+    // Get site info to use as connection name if not provided (optional, fallback to baseurl)
+    const connectionName = createERPNextDto.name || createERPNextDto.baseUrl;
+
+    // Check if connection already exists
+    const existingConnection = await this.connectionRepository.findOneBy({
+      provider: AuthorizationProvider.ERP_Next,
+      userId,
+      name: connectionName,
+    });
+
+    if (existingConnection) {
+      throw new UnableToCreateConnectionException();
+    }
+
+    // Store ERPNext credentials
+    // accessToken -> baseUrl
+    // refreshToken -> token
+    const connection = await this.connectionRepository.save({
+      provider: AuthorizationProvider.ERP_Next,
+      userId,
+      name: connectionName,
+      accessToken: createERPNextDto.baseUrl,
+      refreshToken: createERPNextDto.token,
+    });
+
+    return connection;
+  }
+
+  /**
+   * Test ERPNext connection
+   */
+  async testERPNextConnection(
+    userId: number,
+    connectionName: string,
+  ): Promise<{ message: string; isValid: boolean }> {
     const connection = await this.connectionRepository.findOneBy({
       userId,
       provider: AuthorizationProvider.ERP_Next,
@@ -506,14 +563,13 @@ export class ConnectionService {
     }
 
     try {
-      const ERP_BASE_URL = this.configService.get<string>('ERP_BASE_URL');
-      // Verify token by calling a simple endpoint
-      await axios.get(`${ERP_BASE_URL}/api/method/frappe.auth.get_logged_user`, {
+      // Use stored baseUrl and token
+      await axios.get(`${connection.accessToken}/api/method/frappe.auth.get_logged_user`, {
         headers: {
-          Authorization: `Bearer ${connection.accessToken}`,
+          Authorization: `token ${connection.refreshToken}`,
         },
       });
-      
+
       return {
         message: 'Connection successful',
         isValid: true,
