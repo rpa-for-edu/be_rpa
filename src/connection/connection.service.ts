@@ -164,8 +164,15 @@ export class ConnectionService {
 
     try {
       const res = await oauth2Client.refreshAccessToken();
+      const { credentials } = res;
+      connection.accessToken = credentials.access_token;
+      if (credentials.refresh_token) {
+        connection.refreshToken = credentials.refresh_token;
+      }
+      await this.connectionRepository.save(connection);
       return 'Refresh token sucessfully';
-    } catch {
+    } catch (error) {
+      this.logger.error(error);
       throw new CannotRefreshToken();
     }
   }
