@@ -537,6 +537,7 @@ export class ConnectionService {
       name: connectionName,
       accessToken: createERPNextDto.baseUrl,
       refreshToken: createERPNextDto.token,
+      connectionKey: crypto.randomUUID(),
     });
 
     return connection;
