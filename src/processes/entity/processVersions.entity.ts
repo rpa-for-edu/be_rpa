@@ -4,10 +4,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Process } from './process.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity()
 export class ProcessVersion {
@@ -37,4 +39,7 @@ export class ProcessVersion {
 
   @Column({ default: false })
   isCurrent: boolean;
+
+  @OneToMany(() => CommentEntity, (comment) => comment.processVersion)
+  comments: CommentEntity[];
 }

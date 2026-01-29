@@ -17,6 +17,7 @@ import { ProcessDetail } from './schema/process.schema';
 import { CreateProcessVersionDto } from './dto/create-process-version.dto';
 import { ApiResponseWrapper } from 'src/common/dto/api-response.dto';
 import { CreateProcessAllParamsDto } from './dto/create-process-allParams.dto';
+import { AddCommentToElementDto } from './dto/addCommentToElement.dto';
 
 @Controller('processes')
 @ApiTags('processes')
@@ -146,4 +147,20 @@ export class ProcessesController {
   ) {
     return await this.processesService.deleteProcessVersion(user.id, processId, versionId);
   }
+
+  //! End Process Versioning Endpoints
+
+  //! Comments Endpoints
+  @Post('/comments')
+  @ApiResponseWrapper()
+  async addCommentToElement(@UserDecor() user: UserPayload, @Body() body: AddCommentToElementDto) {
+    return await this.processesService.addCommentToElement(user.id, body);
+  }
+
+  @Get('/:id/comments')
+  @ApiResponseWrapper()
+  async getCommentsOfProcess(@UserDecor() user: UserPayload, @Param('id') processId: string) {
+    return await this.processesService.getCommentsOfProcess(user.id, processId);
+  }
+  //! End Comments Endpoints
 }

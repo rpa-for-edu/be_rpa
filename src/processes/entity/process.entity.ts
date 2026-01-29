@@ -11,6 +11,7 @@ import { User } from '../../users/entity/user.entity';
 import { Workspace } from '../../workspace/entity/workspace.entity';
 import { Team } from '../../workspace/entity/team.entity';
 import { ProcessVersion } from './processVersions.entity';
+import { CommentEntity } from './comment.entity';
 
 export enum ProcessScope {
   PERSONAL = 'personal',
@@ -81,4 +82,7 @@ export class Process {
 
   @OneToMany(() => ProcessVersion, (processVersion) => processVersion.process)
   versions: ProcessVersion[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.process)
+  comments: CommentEntity[];
 }
