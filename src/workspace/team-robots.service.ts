@@ -47,6 +47,7 @@ export class TeamRobotsService {
         processId: r.processId,
         processName: r.process?.name,
         processVersion: r.processVersion,
+        triggerType: r.triggerType,
         createdBy: r.user?.name,
         createdAt: r.createdAt,
       })),
@@ -179,11 +180,7 @@ export class TeamRobotsService {
   /**
    * Get robot connections
    */
-  async getRobotConnections(
-    teamId: string,
-    robotKey: string,
-    userId: number,
-  ): Promise<any> {
+  async getRobotConnections(teamId: string, robotKey: string, userId: number): Promise<any> {
     const member = await this.teamPermissionService.checkTeamMember(teamId, userId);
     this.teamPermissionService.requirePermission(member, 'view_robots');
 
@@ -242,11 +239,11 @@ export class TeamRobotsService {
 
     // Check permission based on action
     const requiredPermission = action === 'delete' ? 'delete_robot' : 'run_robot';
-    
+
     if (!this.teamPermissionService.checkPermission(member, requiredPermission)) {
       validationResult.isValid = false;
       validationResult.errors.push(
-        `You don't have '${requiredPermission}' permission in this team`
+        `You don't have '${requiredPermission}' permission in this team`,
       );
       return validationResult;
     }

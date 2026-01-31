@@ -24,7 +24,7 @@ export class ActivityTemplate {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ unique: true })
+  @Column()
   keyword: string; // VD: "open_browser", "upload_file_to_drive"
 
   @OneToMany(() => Argument, (arg) => arg.activityTemplate, { cascade: true })
