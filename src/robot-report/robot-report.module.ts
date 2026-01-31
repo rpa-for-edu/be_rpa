@@ -5,10 +5,11 @@ import { RobotRunLog } from './entity/robot-run-log.entity';
 import { RobotRunOverall } from './entity/robot-run-overall.entity';
 import { RobotReportService } from './robot-report.service';
 import { RobotReportController } from './robot-report.controller';
+import { RobotReportRealtimeGateway } from './robot-report.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([RobotRunDetail, RobotRunLog, RobotRunOverall])],
-  providers: [RobotReportService],
+  providers: [RobotReportService, RobotReportRealtimeGateway],
   controllers: [RobotReportController],
 })
 export class RobotReportModule {}

@@ -48,7 +48,6 @@ export class ProcessCommentsGateway {
       client.data.userId,
       addCommentDto,
     );
-    console.log('Comment created:', dto);
     const returnComment = {
       id: comment.id,
       process_id: comment.process_id,
