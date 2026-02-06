@@ -1,0 +1,111 @@
+name: 🚀 Deploy to Azure VM
+
+on:
+  push:
+    branches: [azure-deploy, main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/be_rpa_app
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # =============================================
+  # BUILD DOCKER IMAGE
+  # =============================================
+  build:
+    name: 🔨 Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # =============================================
+  # DEPLOY TO AZURE VM
+  # =============================================
+  deploy:
+    name: 🚀 Deploy to Azure VM
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create .env File
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Copy Files to Azure VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.AZURE_HOST }}
+          username: ${{ secrets.AZURE_USER }}
+          key: ${{ secrets.AZURE_SSH_KEY }}
+          port: ${{ secrets.AZURE_SSH_PORT || 22 }}
+          source: '.env,docker-compose.yml'
+          target: /home/${{ secrets.AZURE_USER }}/be_rpa_app
+
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AZURE_HOST }}
+          username: ${{ secrets.AZURE_USER }}
+          key: ${{ secrets.AZURE_SSH_KEY }}
+          port: ${{ secrets.AZURE_SSH_PORT || 22 }}
+          envs: GHCR_TOKEN,GHCR_USERNAME,IMAGE_NAME
+          script: |
+            cd /home/${{ secrets.AZURE_USER }}/be_rpa_app
+
+            echo "🚀 Starting Deployment..."
+
+            # Login to GHCR
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+
+            # Pull latest image
+            docker compose pull app
+
+            # Restart app container
+            docker compose up -d app
+
+            # Initial migration check
+            echo "🔍 Checking for pending migrations..."
+            docker compose exec -T app node node_modules/typeorm/cli.js migration:run -d dist/config/mysql.datasource.js || echo "⚠️ Migration warning: Check logs if needed"
+
+            # Clean up unused images
+            docker image prune -f
+
+            echo "✅ Deployment successful!"
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }} # Default token might not work if 3rd party package usage 
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
