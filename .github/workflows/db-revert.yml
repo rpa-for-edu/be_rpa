@@ -1,4 +1,4 @@
-name: ⏪ Revert Database Migration
+name: Revert Database Migration
 
 on:
   workflow_dispatch:
@@ -22,10 +22,10 @@ jobs:
           key: ${{ secrets.AZURE_SSH_KEY }}
           port: ${{ secrets.AZURE_SSH_PORT || 22 }}
           script: |
-            echo "⏪ Reverting Last Migration..."
+            echo "Reverting Last Migration..."
             cd /home/${{ secrets.AZURE_USER }}/be_rpa_app
             
             # Run revert inside the container using compiled code
             docker compose exec -T app node node_modules/typeorm/cli.js migration:revert -d dist/config/mysql.datasource.js
             
-            echo "✅ Revert completed successfully!"
+            echo "Revert completed successfully!"

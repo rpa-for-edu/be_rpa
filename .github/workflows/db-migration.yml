@@ -1,4 +1,4 @@
-name: 🔄 Database Migration
+name: Database Migration
 
 on:
   workflow_dispatch:
@@ -22,10 +22,10 @@ jobs:
           key: ${{ secrets.AZURE_SSH_KEY }}
           port: ${{ secrets.AZURE_SSH_PORT || 22 }}
           script: |
-            echo "🔄 Running Database Migration..."
+            echo "Running Database Migration..."
             cd /home/${{ secrets.AZURE_USER }}/be_rpa_app
             
             # Run migration inside the container using compiled code
             docker compose exec -T app node node_modules/typeorm/cli.js migration:run -d dist/config/mysql.datasource.js
             
-            echo "✅ Migration completed successfully!"
+            echo "Migration completed successfully!"
