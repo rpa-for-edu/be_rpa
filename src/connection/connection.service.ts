@@ -287,6 +287,9 @@ export class ConnectionService {
         credentialData = {
           access_token: conn.connection.accessToken, // baseUrl
           refresh_token: conn.connection.refreshToken, // Moodle/ERPNext token
+          ...(conn.connection.provider === AuthorizationProvider.ERP_Next
+            ? { base_url: this.configService.get('ERP_BASE_URL') }
+            : {}),
         };
       } else {
         // All other providers use GoogleCredentialService

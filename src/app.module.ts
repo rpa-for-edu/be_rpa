@@ -22,6 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TaskScheduleModule } from './task-schedule/task-schedule.module';
 import { RobotReportModule } from './robot-report/robot-report.module';
 import { WorkspaceModule } from './workspace/workspace.module';
+import { S3Module } from './common/modules/s3.module';
 
 const ENV_FILE_PATH =
   process.env.NODE_ENV === 'production'
@@ -77,6 +78,7 @@ const ENV_FILE_PATH =
 
     ScheduleModule.forRoot(),
 
+    S3Module,
     UsersModule,
     AuthModule,
     EmailModule,

@@ -61,7 +61,8 @@ export const ActivityPackages = [
         return: {
           displayName: 'Thư mục',
           type: 'dictionary',
-          description: 'Thư mục đã tạo. Dạng từ điển, chứa: id (id thư mục), url (url thư mục)',
+          description:
+            'Thư mục đã tạo. Dạng từ điển, chứa: id (id thư mục), url (url thư mục)',
         },
       },
       {
@@ -94,7 +95,8 @@ export const ActivityPackages = [
       {
         templateId: 'drive.upload_file',
         displayName: 'Tải lên tệp',
-        description: 'Tải lên một tệp từ hệ thống tệp của robot lên Google Drive',
+        description:
+          'Tải lên một tệp từ hệ thống tệp của robot lên Google Drive',
         iconCode: 'FaGoogleDrive',
         type: 'activity',
         keyword: 'Upload Drive File',
@@ -129,7 +131,8 @@ export const ActivityPackages = [
       {
         templateId: 'drive.get_file_list_in_folder',
         displayName: 'Lấy danh sách tệp trong thư mục',
-        description: 'Lấy danh sách các tệp trong một thư mục chỉ định trên Google Drive',
+        description:
+          'Lấy danh sách các tệp trong một thư mục chỉ định trên Google Drive',
         iconCode: 'FaGoogleDrive',
         type: 'activity',
         keyword: 'Search Drive Files',
@@ -200,7 +203,8 @@ export const ActivityPackages = [
       {
         templateId: 'drive.move_file_folder',
         displayName: 'Di chuyển tệp/thư mục',
-        description: 'Di chuyển một tệp/thư mục sang thư mục khác trên Google Drive',
+        description:
+          'Di chuyển một tệp/thư mục sang thư mục khác trên Google Drive',
         iconCode: 'FaGoogleDrive',
         type: 'activity',
         keyword: 'Move Drive File',
@@ -246,7 +250,8 @@ export const ActivityPackages = [
           },
           Permission: {
             type: 'enum.permission',
-            description: 'Vai trò bao gồm người đọc, người nhận xét, người chỉnh sửa',
+            description:
+              'Vai trò bao gồm người đọc, người nhận xét, người chỉnh sửa',
             keywordArg: 'role',
             value: 'reader',
           },
@@ -260,7 +265,8 @@ export const ActivityPackages = [
         return: {
           displayName: 'Phản hồi chia sẻ',
           type: 'dictionary',
-          description: 'Phản hồi chia sẻ. Dạng từ điển, chứa: file_id, permission_id',
+          description:
+            'Phản hồi chia sẻ. Dạng từ điển, chứa: file_id, permission_id',
         },
       },
     ],
@@ -527,7 +533,8 @@ export const ActivityPackages = [
       {
         templateId: 'sheet.write_data_to_sheet',
         displayName: 'Ghi dữ liệu vào trang tính',
-        description: 'Ghi dữ liệu vào trang tính trong một Bảng tính Google Sheet',
+        description:
+          'Ghi dữ liệu vào trang tính trong một Bảng tính Google Sheet',
         iconCode: 'FaFileSpreadsheet',
         type: 'activity',
         keyword: 'Update Sheet Values',
@@ -560,7 +567,8 @@ export const ActivityPackages = [
       {
         templateId: 'sheet.read_data_from_sheet',
         displayName: 'Đọc dữ liệu từ trang tính',
-        description: 'Đọc dữ liệu từ trang tính trong một Bảng tính Google Sheet',
+        description:
+          'Đọc dữ liệu từ trang tính trong một Bảng tính Google Sheet',
         iconCode: 'FaFileSpreadsheet',
         type: 'activity',
         keyword: 'Get Sheet Values',
@@ -581,13 +589,15 @@ export const ActivityPackages = [
         return: {
           displayName: 'Giá trị trang tính',
           type: 'list',
-          description: 'Danh sách các giá trị. Mỗi giá trị là một danh sách các giá trị ô',
+          description:
+            'Danh sách các giá trị. Mỗi giá trị là một danh sách các giá trị ô',
         },
       },
       {
         templateId: 'sheet.clear_data_from_sheet',
         displayName: 'Xóa dữ liệu khỏi trang tính',
-        description: 'Xóa dữ liệu khỏi trang tính trong một Bảng tính Google Sheet',
+        description:
+          'Xóa dữ liệu khỏi trang tính trong một Bảng tính Google Sheet',
         iconCode: 'FaFileSpreadsheet',
         type: 'activity',
         keyword: 'Clear Sheet Values',
@@ -679,7 +689,8 @@ export const ActivityPackages = [
         return: {
           displayName: 'Danh sách Lớp học',
           type: 'list',
-          description: 'Danh sách các đối tượng khóa học dạng từ điển gồm {name, id}',
+          description:
+            'Danh sách các đối tượng khóa học dạng từ điển gồm {name, id}',
         },
       },
       {
@@ -1107,7 +1118,8 @@ export const ActivityPackages = [
       {
         templateId: 'for_each',
         displayName: 'Lặp qua từng phần tử (For each)',
-        description: 'Thực hiện một nhóm hành động cho mỗi phần tử trong danh sách',
+        description:
+          'Thực hiện một nhóm hành động cho mỗi phần tử trong danh sách',
         iconCode: 'ImLoop2',
         type: 'subprocess',
         arguments: {
@@ -1132,7 +1144,8 @@ export const ActivityPackages = [
       {
         templateId: 'for_range',
         displayName: 'Lặp trong khoảng (For Range)',
-        description: 'Thực hiện một nhóm hành động cho mỗi giá trị trong khoảng',
+        description:
+          'Thực hiện một nhóm hành động cho mỗi giá trị trong khoảng',
         iconCode: 'ImLoop2',
         type: 'subprocess',
         arguments: {
@@ -1259,7 +1272,8 @@ export const ActivityPackages = [
   {
     _id: 'browser_automation',
     displayName: 'Tự động hóa trình duyệt',
-    description: 'Giúp bạn tự động hóa các tác vụ cần thực hiện trên trình duyệt web (như Chrome)',
+    description:
+      'Giúp bạn tự động hóa các tác vụ cần thực hiện trên trình duyệt web (như Chrome)',
     library: 'RPA.Browser.Playwright',
     activityTemplates: [
       {
@@ -1282,7 +1296,8 @@ export const ActivityPackages = [
       {
         templateId: 'click',
         displayName: 'Nhấn chuột (Click)',
-        description: 'Nhấn vào một phần tử cụ thể trong tab trình duyệt hiện tại',
+        description:
+          'Nhấn vào một phần tử cụ thể trong tab trình duyệt hiện tại',
         iconCode: 'FaMousePointer',
         type: 'activity',
         keyword: 'Click',
@@ -1299,7 +1314,8 @@ export const ActivityPackages = [
       {
         templateId: 'type',
         displayName: 'Nhập văn bản (Type Into)',
-        description: 'Nhập một văn bản vào phần tử cụ thể trong tab trình duyệt hiện tại',
+        description:
+          'Nhập một văn bản vào phần tử cụ thể trong tab trình duyệt hiện tại',
         iconCode: 'FaKeyboard',
         type: 'activity',
         keyword: 'Fill Text',
@@ -1322,7 +1338,8 @@ export const ActivityPackages = [
       {
         templateId: 'get_text',
         displayName: 'Lấy văn bản',
-        description: 'Lấy văn bản của một phần tử cụ thể trong tab trình duyệt hiện tại',
+        description:
+          'Lấy văn bản của một phần tử cụ thể trong tab trình duyệt hiện tại',
         iconCode: 'FaFont',
         type: 'activity',
         keyword: 'Get Text',
@@ -1416,7 +1433,8 @@ export const ActivityPackages = [
   {
     _id: 'file_storage',
     displayName: 'Lưu trữ tệp',
-    description: 'Giúp bạn lưu trữ và truy xuất tệp trên hệ thống lưu trữ của nền tảng',
+    description:
+      'Giúp bạn lưu trữ và truy xuất tệp trên hệ thống lưu trữ của nền tảng',
     library: 'EduRPA.Storage',
     activityTemplates: [
       {
@@ -1564,7 +1582,8 @@ export const ActivityPackages = [
       {
         templateId: 'create_business_partner_address',
         displayName: 'Tạo địa chỉ Đối tác kinh doanh',
-        description: 'Tạo một địa chỉ mới cho đối tác kinh doanh trong hệ thống SAP',
+        description:
+          'Tạo một địa chỉ mới cho đối tác kinh doanh trong hệ thống SAP',
         iconCode: 'FaAddressCard',
         type: 'activity',
         keyword: 'Create Business Partner Address',
@@ -1591,7 +1610,8 @@ export const ActivityPackages = [
       {
         templateId: 'update_business_partner_address',
         displayName: 'Cập nhật địa chỉ Đối tác kinh doanh',
-        description: 'Cập nhật một địa chỉ hiện có cho đối tác kinh doanh trong hệ thống SAP',
+        description:
+          'Cập nhật một địa chỉ hiện có cho đối tác kinh doanh trong hệ thống SAP',
         iconCode: 'FaEdit',
         type: 'activity',
         keyword: 'Update Business Partner Address',
@@ -1631,7 +1651,8 @@ export const ActivityPackages = [
       {
         templateId: 'delete_business_partner_address',
         displayName: 'Xóa địa chỉ Đối tác kinh doanh',
-        description: 'Xóa một địa chỉ của đối tác kinh doanh trong hệ thống SAP',
+        description:
+          'Xóa một địa chỉ của đối tác kinh doanh trong hệ thống SAP',
         iconCode: 'FaTrash',
         type: 'activity',
         keyword: 'Delete Business Partner Address',
@@ -1660,138 +1681,415 @@ export const ActivityPackages = [
   {
     _id: 'rpa-erpnext',
     displayName: 'ERPNext',
-    description: 'Tự động hóa quy trình mua sắm trong ERPNext (Mặt hàng, MR, RFQ, PO)',
+    description:
+      'Tự động hóa quy trình mua sắm trong ERPNext (Mặt hàng, MR, RFQ, PO, Bán hàng, Kho)',
     library: 'RPA.ERPNext',
     activityTemplates: [
+      // ===== Kết nối =====
       {
-        templateId: 'connect_to_erpnext',
-        displayName: 'Kết nối đến ERPNext',
-        description: 'Kết nối đến ERPNext sử dụng base URL và API token',
+        templateId: 'setup_erpnext_connection',
+        displayName: 'Thiết lập kết nối ERPNext',
+        description: 'Thiết lập kết nối với ERPNext từ file credential JSON',
         iconCode: 'FaLink',
         type: 'activity',
-        keyword: 'Connect To ERPNext',
+        keyword: 'Setup ERPNext Connection',
         arguments: {
-          'Base URL': {
-            type: 'string',
-            description: 'Base URL của hệ thống ERPNext',
-            keywordArg: 'base_url',
-            value: '',
-          },
-          'Token File Path': {
+          'Connection': {
             type: 'connection.ERPNext',
-            description: 'Đường dẫn đến tệp chứa token truy cập ERPNext',
+            description: 'Đường dẫn đến file token JSON chứa base_url và credentials',
             keywordArg: 'token_file_path',
             value: '',
-          },
-          'Verify SSL': {
-            type: 'boolean',
-            description: 'Có xác minh chứng chỉ SSL hay không',
-            keywordArg: 'verify_ssl',
-            value: false,
           },
         },
         return: {
           displayName: 'Trạng thái kết nối',
-          type: 'void',
-          description: 'Chỉ thị kết nối thành công đến ERPNext',
+          type: 'dictionary',
+          description: 'Trạng thái kết nối với base_url',
+        },
+      },
+      // ===== Utility Methods =====
+      {
+        templateId: 'get_document',
+        displayName: 'Lấy Document',
+        description: 'Lấy thông tin chi tiết của một document',
+        iconCode: 'FaFileAlt',
+        type: 'activity',
+        keyword: 'Get Document',
+        arguments: {
+          DocType: {
+            type: 'string',
+            description: 'Loại document (Item, Customer, Sales Order, etc.)',
+            keywordArg: 'doctype',
+            value: '',
+          },
+          Name: {
+            type: 'string',
+            description: 'Tên/ID của document',
+            keywordArg: 'name',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Document',
+          type: 'dictionary',
+          description: 'Thông tin document',
         },
       },
       {
-        templateId: 'ensure_item_exists',
-        displayName: 'Đảm bảo mặt hàng tồn tại',
-        description: 'Kiểm tra nếu mặt hàng tồn tại trong ERPNext; nếu không, tự động tạo mới.',
+        templateId: 'list_documents',
+        displayName: 'Liệt kê Documents',
+        description: 'Lấy danh sách documents với filters',
+        iconCode: 'FaList',
+        type: 'activity',
+        keyword: 'List Documents',
+        arguments: {
+          DocType: {
+            type: 'string',
+            description: 'Loại document',
+            keywordArg: 'doctype',
+            value: '',
+          },
+          Filters: {
+            type: 'dictionary',
+            description: 'Điều kiện lọc (dict hoặc JSON string)',
+            keywordArg: 'filters',
+            value: {},
+          },
+          Fields: {
+            type: 'list',
+            description: 'Các trường cần lấy',
+            keywordArg: 'fields',
+            value: [],
+          },
+          Limit: {
+            type: 'number',
+            description: 'Số lượng kết quả tối đa',
+            keywordArg: 'limit',
+            value: 20,
+          },
+        },
+        return: {
+          displayName: 'Documents',
+          type: 'list',
+          description: 'Danh sách documents',
+        },
+      },
+      {
+        templateId: 'update_document',
+        displayName: 'Cập nhật Document',
+        description: 'Cập nhật một document',
+        iconCode: 'FaEdit',
+        type: 'activity',
+        keyword: 'Update Document',
+        arguments: {
+          DocType: {
+            type: 'string',
+            description: 'Loại document',
+            keywordArg: 'doctype',
+            value: '',
+          },
+          Name: {
+            type: 'string',
+            description: 'Tên/ID của document',
+            keywordArg: 'name',
+            value: '',
+          },
+          Data: {
+            type: 'dictionary',
+            description: 'Dữ liệu cần cập nhật',
+            keywordArg: 'data',
+            value: {},
+          },
+        },
+        return: {
+          displayName: 'Document đã cập nhật',
+          type: 'dictionary',
+          description: 'Document đã được cập nhật',
+        },
+      },
+      {
+        templateId: 'delete_document',
+        displayName: 'Xóa Document',
+        description: 'Xóa một document',
+        iconCode: 'FaTrash',
+        type: 'activity',
+        keyword: 'Delete Document',
+        arguments: {
+          DocType: {
+            type: 'string',
+            description: 'Loại document',
+            keywordArg: 'doctype',
+            value: '',
+          },
+          Name: {
+            type: 'string',
+            description: 'Tên/ID của document',
+            keywordArg: 'name',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Trạng thái',
+          type: 'dictionary',
+          description: 'Trạng thái xóa',
+        },
+      },
+      // ===== Master Data - Ensure Functions =====
+      {
+        templateId: 'ensure_company_exist',
+        displayName: 'Đảm bảo Company tồn tại',
+        description: 'Đảm bảo Company tồn tại, tạo mới nếu chưa có',
+        iconCode: 'FaBuilding',
+        type: 'activity',
+        keyword: 'Ensure Company Exist',
+        arguments: {
+          Company: {
+            type: 'string',
+            description: 'Tên công ty',
+            keywordArg: 'company',
+            value: '',
+          },
+          Abbr: {
+            type: 'string',
+            description: 'Viết tắt (VD: EDU)',
+            keywordArg: 'abbr',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Thông tin Company',
+          type: 'dictionary',
+          description: 'Thông tin company',
+        },
+      },
+      {
+        templateId: 'ensure_warehouse_exist',
+        displayName: 'Đảm bảo Warehouse tồn tại',
+        description: 'Đảm bảo Warehouse tồn tại',
+        iconCode: 'FaWarehouse',
+        type: 'activity',
+        keyword: 'Ensure Warehouse Exist',
+        arguments: {
+          Warehouse: {
+            type: 'string',
+            description: 'Tên kho',
+            keywordArg: 'warehouse',
+            value: '',
+          },
+          Company: {
+            type: 'string',
+            description: 'Tên công ty',
+            keywordArg: 'company',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Thông tin Warehouse',
+          type: 'dictionary',
+          description: 'Thông tin warehouse',
+        },
+      },
+      {
+        templateId: 'ensure_supplier_exist',
+        displayName: 'Đảm bảo Supplier tồn tại',
+        description: 'Đảm bảo Supplier tồn tại',
+        iconCode: 'FaTruck',
+        type: 'activity',
+        keyword: 'Ensure Supplier Exist',
+        arguments: {
+          'Supplier Name': {
+            type: 'string',
+            description: 'Tên nhà cung cấp',
+            keywordArg: 'supplier_name',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Thông tin Supplier',
+          type: 'dictionary',
+          description: 'Thông tin supplier',
+        },
+      },
+      {
+        templateId: 'ensure_items_exist',
+        displayName: 'Đảm bảo Items tồn tại',
+        description: 'Đảm bảo tất cả items tồn tại',
         iconCode: 'FaBox',
         type: 'activity',
-        keyword: 'Ensure ERP Item Exists',
-        arguments: {
-          'Item Code': {
-            type: 'string',
-            description: 'Mã mặt hàng (duy nhất)',
-            keywordArg: 'item_code',
-            value: '',
-          },
-          'Item Name': {
-            type: 'string',
-            description: 'Tên hiển thị của mặt hàng',
-            keywordArg: 'item_name',
-            value: '',
-          },
-          'Unit of Measure': {
-            type: 'string',
-            description: 'Đơn vị tính mặc định (ví dụ: Nos, Kg)',
-            keywordArg: 'uom',
-            value: 'Nos',
-          },
-        },
-        return: {
-          displayName: 'Tên mặt hàng',
-          type: 'string',
-          description: 'Tên của mặt hàng đã tạo hoặc đang tồn tại',
-        },
-      },
-      // Assignment Management
-      {
-        templateId: 'create_material_request',
-        displayName: 'Tạo Yêu cầu vật tư (Material Request)',
-        description: 'Tạo tài liệu Yêu cầu vật tư trong ERPNext với nhiều mặt hàng.',
-        iconCode: 'FaClipboardList',
-        type: 'activity',
-        keyword: 'Create ERP Material Request',
+        keyword: 'Ensure Items Exist',
         arguments: {
           Items: {
             type: 'list',
-            description:
-              'Danh sách mặt hàng yêu cầu. Mỗi mục phải bao gồm item_code, qty, schedule_date',
-            keywordArg: 'items',
+            description: 'Danh sách items [{item_code, description}]',
+            keywordArg: 'items_json',
             value: [],
           },
         },
         return: {
-          displayName: 'ID Yêu cầu vật tư',
-          type: 'string',
-          description: 'Tên của tài liệu Yêu cầu vật tư đã tạo',
+          displayName: 'Items đã tạo',
+          type: 'list',
+          description: 'Danh sách items đã tạo/tồn tại',
         },
       },
       {
-        templateId: 'create_request_for_quotation',
-        displayName: 'Tạo Yêu cầu báo giá (RFQ)',
-        description: 'Tạo một RFQ trong ERPNext cho một hoặc nhiều nhà cung cấp.',
+        templateId: 'ensure_customer_exist',
+        displayName: 'Đảm bảo Customer tồn tại',
+        description: 'Đảm bảo Customer tồn tại',
+        iconCode: 'FaUser',
+        type: 'activity',
+        keyword: 'Ensure Customer Exist',
+        arguments: {
+          'Customer Name': {
+            type: 'string',
+            description: 'Tên khách hàng',
+            keywordArg: 'customer_name',
+            value: '',
+          },
+          'Customer Group': {
+            type: 'string',
+            description: 'Nhóm khách hàng',
+            keywordArg: 'customer_group',
+            value: 'Commercial',
+          },
+          Territory: {
+            type: 'string',
+            description: 'Khu vực',
+            keywordArg: 'territory',
+            value: 'Vietnam',
+          },
+        },
+        return: {
+          displayName: 'Thông tin Customer',
+          type: 'dictionary',
+          description: 'Thông tin customer',
+        },
+      },
+      // ===== Sales APIs =====
+      {
+        templateId: 'create_sales_order',
+        displayName: 'Tạo Sales Order',
+        description: 'Tạo Sales Order (Đơn hàng bán)',
+        iconCode: 'FaShoppingCart',
+        type: 'activity',
+        keyword: 'Create Sales Order',
+        arguments: {
+          Customer: {
+            type: 'string',
+            description: 'Tên khách hàng',
+            keywordArg: 'customer',
+            value: '',
+          },
+          Items: {
+            type: 'list',
+            description: 'Danh sách items [{item_code, qty, rate}]',
+            keywordArg: 'items',
+            value: [],
+          },
+          'Delivery Date': {
+            type: 'string',
+            description: 'Ngày giao hàng (YYYY-MM-DD)',
+            keywordArg: 'delivery_date',
+            value: '',
+          },
+          Company: {
+            type: 'string',
+            description: 'Tên công ty',
+            keywordArg: 'company',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Sales Order',
+          type: 'dictionary',
+          description: 'Thông tin Sales Order đã tạo',
+        },
+      },
+      {
+        templateId: 'create_sales_invoice',
+        displayName: 'Tạo Sales Invoice',
+        description: 'Tạo Sales Invoice (Hóa đơn bán hàng)',
         iconCode: 'FaFileInvoiceDollar',
         type: 'activity',
-        keyword: 'Create ERP RFQ',
+        keyword: 'Create Sales Invoice',
         arguments: {
+          Customer: {
+            type: 'string',
+            description: 'Tên khách hàng',
+            keywordArg: 'customer',
+            value: '',
+          },
           Items: {
             type: 'list',
-            description: 'Danh sách mặt hàng cần báo giá',
+            description: 'Danh sách items [{item_code, qty, rate}]',
             keywordArg: 'items',
             value: [],
           },
-          Suppliers: {
-            type: 'list',
-            description: 'Danh sách tên nhà cung cấp',
-            keywordArg: 'suppliers',
-            value: [],
-          },
-          'Message For Supplier': {
+          Company: {
             type: 'string',
-            description: 'Tin nhắn hiển thị cho nhà cung cấp trong RFQ',
-            keywordArg: 'message_for_supplier',
-            value: 'Xin vui lòng báo giá cho các mặt hàng này.',
+            description: 'Tên công ty',
+            keywordArg: 'company',
+            value: '',
+          },
+          'Posting Date': {
+            type: 'string',
+            description: 'Ngày lập hóa đơn (optional)',
+            keywordArg: 'posting_date',
+            value: '',
           },
         },
         return: {
-          displayName: 'ID RFQ',
-          type: 'string',
-          description: 'Tên của tài liệu RFQ đã tạo',
+          displayName: 'Sales Invoice',
+          type: 'dictionary',
+          description: 'Thông tin hóa đơn đã tạo',
+        },
+      },
+      // ===== Stock/Inventory APIs =====
+      {
+        templateId: 'create_stock_entry',
+        displayName: 'Tạo Stock Entry',
+        description: 'Tạo Stock Entry (Phiếu nhập/xuất kho)',
+        iconCode: 'FaWarehouse',
+        type: 'activity',
+        keyword: 'Create Stock Entry',
+        arguments: {
+          Purpose: {
+            type: 'string',
+            description: 'Mục đích (Material Receipt, Material Issue, Material Transfer)',
+            keywordArg: 'purpose',
+            value: 'Material Receipt',
+          },
+          Items: {
+            type: 'list',
+            description: 'Danh sách items [{item_code, qty, s_warehouse, t_warehouse}]',
+            keywordArg: 'items',
+            value: [],
+          },
+          Company: {
+            type: 'string',
+            description: 'Tên công ty',
+            keywordArg: 'company',
+            value: '',
+          },
+          'Posting Date': {
+            type: 'string',
+            description: 'Ngày lập phiếu (optional)',
+            keywordArg: 'posting_date',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Stock Entry',
+          type: 'dictionary',
+          description: 'Thông tin Stock Entry đã tạo',
         },
       },
       {
-        templateId: 'create_purchase_order',
-        displayName: 'Tạo Đơn hàng mua (Purchase Order)',
-        description: 'Tạo tài liệu Đơn hàng mua trong ERPNext cho một nhà cung cấp.',
-        iconCode: 'FaFileInvoice',
+        templateId: 'create_purchase_receipt',
+        displayName: 'Tạo Purchase Receipt',
+        description: 'Tạo Purchase Receipt (Phiếu nhận hàng mua)',
+        iconCode: 'FaClipboardCheck',
         type: 'activity',
-        keyword: 'Create ERP Purchase Order',
+        keyword: 'Create Purchase Receipt',
         arguments: {
           Supplier: {
             type: 'string',
@@ -1801,80 +2099,287 @@ export const ActivityPackages = [
           },
           Items: {
             type: 'list',
-            description: 'Danh sách mặt hàng cần đặt (với item_code, qty, rate)',
+            description: 'Danh sách items [{item_code, qty, rate, warehouse}]',
             keywordArg: 'items',
             value: [],
           },
-          'Default Rate': {
-            type: 'number',
-            description: 'Giá mặc định mỗi mặt hàng nếu không được chỉ định',
-            keywordArg: 'default_rate',
-            value: 1000,
+          Company: {
+            type: 'string',
+            description: 'Tên công ty',
+            keywordArg: 'company',
+            value: '',
+          },
+          'Posting Date': {
+            type: 'string',
+            description: 'Ngày nhận hàng (optional)',
+            keywordArg: 'posting_date',
+            value: '',
           },
         },
         return: {
-          displayName: 'ID Đơn hàng mua',
-          type: 'string',
-          description: 'Tên của Đơn hàng mua đã tạo',
+          displayName: 'Purchase Receipt',
+          type: 'dictionary',
+          description: 'Thông tin Purchase Receipt đã tạo',
         },
       },
       {
-        templateId: 'submit_erp_document',
-        displayName: 'Gửi tài liệu ERP',
-        description:
-          'Gửi (Submit) một tài liệu ERPNext hiện có (Yêu cầu vật tư, RFQ hoặc Đơn hàng mua).',
-        iconCode: 'FaCheckCircle',
+        templateId: 'create_purchase_order',
+        displayName: 'Tạo Purchase Order',
+        description: 'Tạo Purchase Order (Đơn hàng mua)',
+        iconCode: 'FaFileInvoice',
         type: 'activity',
-        keyword: 'Submit ERP Document',
+        keyword: 'Create Purchase Order',
         arguments: {
-          DocType: {
+          Supplier: {
             type: 'string',
-            description:
-              'Loại tài liệu ERPNext (ví dụ: Material Request, Request for Quotation, Purchase Order)',
-            keywordArg: 'doctype',
+            description: 'Tên nhà cung cấp',
+            keywordArg: 'supplier',
             value: '',
           },
-          'Document ID': {
+          Items: {
+            type: 'list',
+            description: 'Danh sách items [{item_code, qty, rate}]',
+            keywordArg: 'items',
+            value: [],
+          },
+          Company: {
             type: 'string',
-            description: 'Tên hoặc ID của tài liệu cần gửi',
-            keywordArg: 'name',
+            description: 'Tên công ty',
+            keywordArg: 'company',
             value: '',
           },
-          'Question File ID': {
+          'Schedule Date': {
             type: 'string',
-            keywordArg: 'question_file_id',
-            description: 'ID tệp câu hỏi',
+            description: 'Ngày cần hàng (YYYY-MM-DD)',
+            keywordArg: 'schedule_date',
             value: '',
-          },
-          'Answer Key File ID': {
-            type: 'string',
-            keywordArg: 'answer_key_file_id',
-            description: 'ID tệp đáp án',
-            value: '',
-          },
-          'Course ID': {
-            type: 'number',
-            keywordArg: 'course_id',
-            description: 'ID khóa học Moodle',
-            value: 0,
-          },
-          'Assignment ID': {
-            type: 'number',
-            keywordArg: 'assignment_id',
-            description: 'ID bài tập Moodle',
-            value: 0,
-          },
-          'Max Score': {
-            type: 'number',
-            keywordArg: 'max_score',
-            description: 'Điểm tối đa',
-            value: 10.0,
           },
         },
         return: {
-          displayName: 'Kết quả gửi',
-          type: 'string',
-          description: 'Tên của tài liệu đã gửi',
+          displayName: 'Purchase Order',
+          type: 'dictionary',
+          description: 'Thông tin Purchase Order đã tạo',
+        },
+      },
+      // ===== Accounting APIs =====
+      {
+        templateId: 'create_purchase_invoice',
+        displayName: 'Tạo Purchase Invoice',
+        description: 'Tạo Purchase Invoice (Hóa đơn mua hàng)',
+        iconCode: 'FaFileInvoice',
+        type: 'activity',
+        keyword: 'Create Purchase Invoice',
+        arguments: {
+          Supplier: {
+            type: 'string',
+            description: 'Tên nhà cung cấp',
+            keywordArg: 'supplier',
+            value: '',
+          },
+          Items: {
+            type: 'list',
+            description: 'Danh sách items [{item_code, qty, rate}]',
+            keywordArg: 'items',
+            value: [],
+          },
+          Company: {
+            type: 'string',
+            description: 'Tên công ty',
+            keywordArg: 'company',
+            value: '',
+          },
+          'Posting Date': {
+            type: 'string',
+            description: 'Ngày lập hóa đơn (optional)',
+            keywordArg: 'posting_date',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Purchase Invoice',
+          type: 'dictionary',
+          description: 'Thông tin hóa đơn mua hàng đã tạo',
+        },
+      },
+      {
+        templateId: 'create_payment_entry',
+        displayName: 'Tạo Payment Entry',
+        description: 'Tạo Payment Entry (Phiếu thanh toán)',
+        iconCode: 'FaMoneyBillWave',
+        type: 'activity',
+        keyword: 'Create Payment Entry',
+        arguments: {
+          'Payment Type': {
+            type: 'string',
+            description: 'Loại thanh toán (Receive, Pay, Internal Transfer)',
+            keywordArg: 'payment_type',
+            value: 'Pay',
+          },
+          'Party Type': {
+            type: 'string',
+            description: 'Loại đối tác (Customer, Supplier, Employee)',
+            keywordArg: 'party_type',
+            value: 'Supplier',
+          },
+          Party: {
+            type: 'string',
+            description: 'Tên đối tác',
+            keywordArg: 'party',
+            value: '',
+          },
+          'Paid Amount': {
+            type: 'number',
+            description: 'Số tiền thanh toán',
+            keywordArg: 'paid_amount',
+            value: 0,
+          },
+          Company: {
+            type: 'string',
+            description: 'Tên công ty',
+            keywordArg: 'company',
+            value: '',
+          },
+          'Posting Date': {
+            type: 'string',
+            description: 'Ngày thanh toán (optional)',
+            keywordArg: 'posting_date',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Payment Entry',
+          type: 'dictionary',
+          description: 'Thông tin phiếu thanh toán đã tạo',
+        },
+      },
+      // ===== Procurement Flow =====
+      {
+        templateId: 'load_excel_request',
+        displayName: 'Đọc Excel Request',
+        description: 'Đọc file Excel chứa company, itemcode, quantity',
+        iconCode: 'FaFileExcel',
+        type: 'activity',
+        keyword: 'Load Excel Request',
+        arguments: {
+          Path: {
+            type: 'string',
+            description: 'Đường dẫn file Excel',
+            keywordArg: 'path',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Dữ liệu',
+          type: 'list',
+          description: 'Danh sách dữ liệu từ Excel',
+        },
+      },
+      {
+        templateId: 'create_material_request_from_excel',
+        displayName: 'Tạo Material Request từ Excel',
+        description: 'Tạo Material Request từ file Excel',
+        iconCode: 'FaClipboardList',
+        type: 'activity',
+        keyword: 'Create Material Request From Excel',
+        arguments: {
+          Path: {
+            type: 'string',
+            description: 'Đường dẫn file Excel',
+            keywordArg: 'path',
+            value: '',
+          },
+          'Schedule Date': {
+            type: 'string',
+            description: 'Ngày cần hàng (YYYY-MM-DD)',
+            keywordArg: 'schedule_date',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Material Request',
+          type: 'dictionary',
+          description: 'Thông tin Material Request đã tạo',
+        },
+      },
+      {
+        templateId: 'send_rfq_from_material_request',
+        displayName: 'Gửi RFQ từ Material Request',
+        description: 'Tạo RFQ dựa trên Material Request',
+        iconCode: 'FaFileInvoiceDollar',
+        type: 'activity',
+        keyword: 'Send RFQ From Material Request',
+        arguments: {
+          'MR Name': {
+            type: 'string',
+            description: 'Mã Material Request (có thể là dict hoặc string)',
+            keywordArg: 'mr_name',
+            value: '',
+          },
+          Suppliers: {
+            type: 'list',
+            description: 'Danh sách nhà cung cấp',
+            keywordArg: 'suppliers',
+            value: [],
+          },
+        },
+        return: {
+          displayName: 'RFQ',
+          type: 'dictionary',
+          description: 'Thông tin RFQ đã tạo',
+        },
+      },
+      {
+        templateId: 'receive_supplier_quotation',
+        displayName: 'Nhận Supplier Quotation',
+        description: 'Nhận báo giá từ Supplier (từ Excel hoặc JSON)',
+        iconCode: 'FaFileAlt',
+        type: 'activity',
+        keyword: 'Receive Supplier Quotation',
+        arguments: {
+          'RFQ Name': {
+            type: 'string',
+            description: 'Mã Request for Quotation',
+            keywordArg: 'rfq_name',
+            value: '',
+          },
+          'Supplier Name': {
+            type: 'string',
+            description: 'Tên nhà cung cấp',
+            keywordArg: 'supplier_name',
+            value: '',
+          },
+          'Quotation Data': {
+            type: 'string',
+            description: 'Đường dẫn file Excel (.xlsx) hoặc JSON string chứa items',
+            keywordArg: 'quotation_data',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Supplier Quotation',
+          type: 'dictionary',
+          description: 'Thông tin báo giá đã tạo',
+        },
+      },
+      {
+        templateId: 'create_purchase_order_from_quotation',
+        displayName: 'Tạo PO từ Quotation',
+        description: 'Tạo Purchase Order từ Supplier Quotation',
+        iconCode: 'FaFileContract',
+        type: 'activity',
+        keyword: 'Create Purchase Order From Quotation',
+        arguments: {
+          'Quotation Name': {
+            type: 'string',
+            description: 'Mã Supplier Quotation (có thể là dict hoặc string)',
+            keywordArg: 'quotation_name',
+            value: '',
+          },
+        },
+        return: {
+          displayName: 'Purchase Order',
+          type: 'dictionary',
+          description: 'Thông tin Purchase Order đã tạo',
         },
       },
     ],
@@ -1883,7 +2388,8 @@ export const ActivityPackages = [
   {
     _id: 'moodle',
     displayName: 'Moodle',
-    description: 'Tích hợp với Moodle LMS để quản lý khóa học và bài trắc nghiệm',
+    description:
+      'Tích hợp với Moodle LMS để quản lý khóa học và bài trắc nghiệm',
     library: 'RPA.Moodle',
     activityTemplates: [
       // Connection Setup
@@ -2126,7 +2632,8 @@ export const ActivityPackages = [
       {
         templateId: 'moodle.generate_quiz_gift_file',
         displayName: 'Tạo tệp GIFT cho Quiz',
-        description: 'Tạo tệp định dạng GIFT để nhập bài trắc nghiệm vào Moodle',
+        description:
+          'Tạo tệp định dạng GIFT để nhập bài trắc nghiệm vào Moodle',
         iconCode: 'FaFileAlt',
         type: 'activity',
         keyword: 'Generate Quiz GIFT File',
@@ -2265,7 +2772,8 @@ export const ActivityPackages = [
       {
         templateId: 'moodle.enrol_user',
         displayName: 'Ghi danh người dùng (Tên)',
-        description: 'Ghi danh người dùng bằng tên đăng nhập và tên rút gọn khóa học',
+        description:
+          'Ghi danh người dùng bằng tên đăng nhập và tên rút gọn khóa học',
         iconCode: 'FaUserCheck',
         type: 'activity',
         keyword: 'Enrol User',
@@ -2645,7 +3153,8 @@ export const ActivityPackages = [
       {
         templateId: 'moodle.get_user_by_username_or_email',
         displayName: 'Lấy người dùng theo tên đăng nhập hoặc Email',
-        description: 'Lấy người dùng bằng tên đăng nhập hoặc email (tìm kiếm linh hoạt)',
+        description:
+          'Lấy người dùng bằng tên đăng nhập hoặc email (tìm kiếm linh hoạt)',
         iconCode: 'FaSearch',
         type: 'activity',
         keyword: 'Get User By Username Or Email',
@@ -2831,7 +3340,8 @@ export const ActivityPackages = [
       {
         templateId: 'moodle.grade_image_submission_with_gemini_vision',
         displayName: 'Chấm bài nộp hình ảnh bằng Gemini Vision',
-        description: 'Chấm bài nộp của học sinh từ hình ảnh sử dụng Gemini Vision',
+        description:
+          'Chấm bài nộp của học sinh từ hình ảnh sử dụng Gemini Vision',
         iconCode: 'FaImage',
         type: 'activity',
         keyword: 'Grade Image Submission With Gemini Vision',
@@ -2885,7 +3395,8 @@ export const ActivityPackages = [
           Grades: {
             type: 'list',
             keywordArg: 'grades',
-            description: 'Danh sách từ điển điểm số gồm student_name, score, feedback',
+            description:
+              'Danh sách từ điển điểm số gồm student_name, score, feedback',
             value: [],
           },
         },
@@ -2970,7 +3481,8 @@ export const ActivityPackages = [
       {
         templateId: 'moodle.export_detailed_grading_results_to_excel',
         displayName: 'Xuất kết quả chấm điểm chi tiết ra Excel',
-        description: 'Xuất câu trả lời chi tiết của học sinh và phân tích điểm ra Excel',
+        description:
+          'Xuất câu trả lời chi tiết của học sinh và phân tích điểm ra Excel',
         iconCode: 'FaFileExcel',
         type: 'activity',
         keyword: 'Export Detailed Grading Results To Excel',
@@ -3003,7 +3515,8 @@ export const ActivityPackages = [
       {
         templateId: 'moodle.export_student_answers_to_csv',
         displayName: 'Xuất câu trả lời học sinh ra CSV',
-        description: 'Chỉ xuất câu trả lời của học sinh ra CSV (không có chi tiết chấm điểm)',
+        description:
+          'Chỉ xuất câu trả lời của học sinh ra CSV (không có chi tiết chấm điểm)',
         iconCode: 'FaFileCsv',
         type: 'activity',
         keyword: 'Export Student Answers To CSV',
@@ -3024,7 +3537,8 @@ export const ActivityPackages = [
         return: {
           displayName: 'Đường dẫn tệp',
           type: 'string',
-          description: 'Đường dẫn đến tệp CSV đã tạo với câu trả lời của học sinh',
+          description:
+            'Đường dẫn đến tệp CSV đã tạo với câu trả lời của học sinh',
         },
       },
       // Complete Workflows
@@ -3185,7 +3699,8 @@ export const ActivityPackages = [
         return: {
           displayName: 'Danh sách điểm',
           type: 'list',
-          description: 'Danh sách từ điển điểm số kèm thông tin học sinh và điểm',
+          description:
+            'Danh sách từ điển điểm số kèm thông tin học sinh và điểm',
         },
       },
       {
@@ -3227,7 +3742,8 @@ export const ActivityPackages = [
         return: {
           displayName: 'Danh sách điểm',
           type: 'list',
-          description: 'Danh sách từ điển điểm số gồm username, fullname, grade',
+          description:
+            'Danh sách từ điển điểm số gồm username, fullname, grade',
         },
       },
       {
@@ -3377,7 +3893,8 @@ export const ActivityPackages = [
         return: {
           displayName: 'Thống kê',
           type: 'dictionary',
-          description: 'Thống kê khóa học bao gồm số lượng học sinh, điểm trung bình, v.v.',
+          description:
+            'Thống kê khóa học bao gồm số lượng học sinh, điểm trung bình, v.v.',
         },
       },
     ],
