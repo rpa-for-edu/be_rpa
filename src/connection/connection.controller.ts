@@ -205,6 +205,14 @@ export class ConnectionController {
     return this.connectionService.getRobotConnection(userId, processId, processVersion);
   }
 
+  @Get('/for-simulation')
+  @Public()
+  @UseGuards(AuthGuard('api-key'))
+  @ApiSecurity('Service-Key')
+  async getScopedConnectionForSimulation(@Body() body: { connectionKeys: string[] }) {
+    return this.connectionService.getScopedConnectionForSimulation(body.connectionKeys);
+  }
+
   @Post('/moodle')
   @ApiOperation({ summary: 'Create Moodle connection' })
   @ApiBody({ type: CreateMoodleConnectionDto })
@@ -255,10 +263,7 @@ export class ConnectionController {
     status: 200,
     description: 'Moodle connection test successful',
   })
-  async testMoodleConnection(
-    @UserDecor() user: UserPayload,
-    @Query('name') name: string,
-  ) {
+  async testMoodleConnection(@UserDecor() user: UserPayload, @Query('name') name: string) {
     try {
       const siteInfo = await this.connectionService.testMoodleConnection(user.id, name);
       return {
@@ -286,14 +291,11 @@ export class ConnectionController {
     status: 200,
     description: 'ERPNext connection test status',
   })
-  async testERPNextConnection(
-    @UserDecor() user: UserPayload,
-    @Query('name') name: string,
-  ) {
+  async testERPNextConnection(@UserDecor() user: UserPayload, @Query('name') name: string) {
     try {
       return await this.connectionService.testERPNextConnection(user.id, name);
     } catch (error) {
-       throw new HttpException(
+      throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
           error: error.message || 'Failed to test ERPNext connection',
@@ -322,10 +324,7 @@ export class ConnectionController {
     @Body() body: CreateERPNextConnectionDto,
   ) {
     try {
-      const connection = await this.connectionService.createERPNextConnection(
-        user.id,
-        body,
-      );
+      const connection = await this.connectionService.createERPNextConnection(user.id, body);
       return {
         message: 'ERPNext connection created successfully',
         connection: {
@@ -356,10 +355,7 @@ export class ConnectionController {
     status: 200,
     description: 'Moodle credentials retrieved successfully',
   })
-  async getMoodleCredentials(
-    @UserDecor() user: UserPayload,
-    @Query('name') name: string,
-  ) {
+  async getMoodleCredentials(@UserDecor() user: UserPayload, @Query('name') name: string) {
     try {
       const credentials = await this.connectionService.getMoodleCredentials(user.id, name);
       return credentials;

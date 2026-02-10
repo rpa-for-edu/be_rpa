@@ -18,7 +18,7 @@ export class GoogleCredentialService implements ICredentialService {
       case AuthorizationProvider.G_FORMS:
         return this.createGoogleFormCredential(connection);
       case AuthorizationProvider.G_SHEETS:
-        return this.createGoogleFormCredential(connection);
+        return this.createGoogleSheetsCredential(connection);
     }
   }
 

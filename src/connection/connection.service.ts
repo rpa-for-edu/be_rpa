@@ -304,6 +304,37 @@ export class ConnectionService {
     return connections;
   }
 
+  async getScopedConnectionForSimulation(connectionKey: string[]) {
+    const { connections } = await this.getConnectionByConnectionKey(connectionKey);
+    if (!connections ) {
+      throw new ConnectionNotFoundException();
+    } 
+    let result = [];
+    let credentialData;
+    // Special handling for Moodle and ERPNext
+    connections.forEach((connection) => {
+    if (
+      connection.provider === AuthorizationProvider.MOODLE ||
+      connection.provider === AuthorizationProvider.ERP_Next
+    ) {
+      credentialData = {
+        access_token: connection.accessToken, // baseUrl
+        refresh_token: connection.refreshToken, // Moodle/ERPNext token
+        ...(connection.provider === AuthorizationProvider.ERP_Next
+          ? { base_url: this.configService.get('ERP_BASE_URL') }
+          : {}),
+      };
+    } else {
+      // All other providers use GoogleCredentialService
+      credentialData = this.googleCredentialService.create(connection);
+    }
+    result.push({
+      fileName: ConnectionService.getCredentialFileName(connection.connectionKey),
+      data: credentialData,
+    });
+    });
+    return result;
+  }
   checkValidCreentials(providers: AuthorizationProvider[], credentials: Connection[]) {
     if (credentials.length != providers.length) {
       let credentialProviders = credentials.map((c: { provider: any }) => c.provider);
