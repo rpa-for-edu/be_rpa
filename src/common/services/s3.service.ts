@@ -16,10 +16,10 @@ export class S3Service {
 
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
-      region: this.configService.get('AWS_REGION'),
+      region: this.configService.get('AWS_REGION_EXTRA'),
       credentials: {
-        accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
-        secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
+        accessKeyId: this.configService.get('AWS_KEY_ID'),
+        secretAccessKey: this.configService.get('AWS_SECRET_KEY'),
       },
     });
     this.defaultBucket = this.configService.get('AWS_S3_ROBOT_BUCKET_NAME');
@@ -46,7 +46,7 @@ export class S3Service {
 
       await this.s3Client.send(command);
 
-      const region = this.configService.get('AWS_REGION');
+      const region = this.configService.get('AWS_REGION_EXTRA');
       const url = `https://${targetBucket}.s3.${region}.amazonaws.com/${key}`;
       
       this.logger.log(`File uploaded successfully: ${url}`);
@@ -148,7 +148,12 @@ export class S3Service {
    */
   getS3Url(key: string, bucket?: string): string {
     const targetBucket = bucket || this.defaultBucket;
-    const region = this.configService.get('AWS_REGION');
+    const region = this.configService.get('AWS_REGION_EXTRA');
     return `https://${targetBucket}.s3.${region}.amazonaws.com/${key}`;
+  }
+
+  getS3URI(key: string, bucket?: string): string {
+    const targetBucket = bucket || this.defaultBucket;
+    return `s3://${targetBucket}/${key}`;
   }
 }
