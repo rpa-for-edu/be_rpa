@@ -137,6 +137,33 @@ export class ActivityPackagesController {
     return ResponseUtil.success(data, 'Library uploaded successfully');
   }
 
+  @Post(':id/image')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiOperation({ summary: 'Upload package image (Admin only)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file (png, jpg)',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOkResponse({ type: ApiResponseDto<ActivityPackageResponseDto> })
+  async uploadImage(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const data = await this.activityPackagesService.uploadImage(id, file);
+    return ResponseUtil.success(data, 'Image uploaded successfully');
+  }
+
   @Put(':id/library/reparse')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({ summary: 'Reparse package library (Admin only)' })

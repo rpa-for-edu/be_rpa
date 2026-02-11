@@ -89,6 +89,9 @@ export class ActivityPackageResponseDto {
   imageKey?: string;
 
   @ApiPropertyOptional()
+  imageUrl?: string;
+
+  @ApiPropertyOptional()
   library?: string;
 
   @ApiPropertyOptional()
@@ -96,6 +99,9 @@ export class ActivityPackageResponseDto {
 
   @ApiProperty()
   isActive: boolean;
+
+  @ApiPropertyOptional()
+  libraryS3Url?: string;
 
   @ApiProperty({ type: [ActivityTemplateResponseDto] })
   @Type(() => ActivityTemplateResponseDto)

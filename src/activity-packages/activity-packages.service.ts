@@ -32,6 +32,18 @@ export class ActivityPackagesService {
   async findAll(): Promise<ActivityPackageResponseDto[]> {
     const packages = await this.packageRepository.find({
       where: { isActive: true },
+      select: [
+        'id',
+        'displayName',
+        'description',
+        'library',
+        'version',
+        'imageKey',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+        'libraryS3Url',
+      ],
       relations: [
         'activityTemplates',
         'activityTemplates.arguments',
@@ -47,7 +59,12 @@ export class ActivityPackagesService {
 
     // DEBUG LOG
     console.log('Allocated packages:', packages.length);
-    packages.forEach(p => console.log(`Package: ${p.displayName}, Templates: ${p.activityTemplates?.length}`));
+    packages.forEach(p => {
+      console.log(`Package: ${p.displayName}, Templates: ${p.activityTemplates?.length}`);
+      if (p.imageKey) {
+        p.imageUrl = this.s3Service.getS3Url(p.imageKey);
+      }
+    });
 
     return plainToInstance(ActivityPackageResponseDto, packages, {
       excludeExtraneousValues: false,
@@ -57,6 +74,22 @@ export class ActivityPackagesService {
   // Get ALL packages including inactive (for admin)
   async findAllForAdmin(): Promise<ActivityPackageResponseDto[]> {
     const packages = await this.packageRepository.find({
+      select: [
+        'id',
+        'displayName',
+        'description',
+        'library',
+        'version',
+        'imageKey',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+        'parseStatus',
+        'parseError',
+        'libraryFileName',
+        'libraryVersion',
+        'libraryS3Url',
+      ],
       relations: [
         'activityTemplates',
         'activityTemplates.arguments',
@@ -69,6 +102,12 @@ export class ActivityPackagesService {
           name: 'ASC',
         },
       },
+    });
+
+    packages.forEach(p => {
+      if (p.imageKey) {
+        p.imageUrl = this.s3Service.getS3Url(p.imageKey);
+      }
     });
 
     return plainToInstance(ActivityPackageResponseDto, packages, {
@@ -99,6 +138,18 @@ export class ActivityPackagesService {
         id: In(packageIds),
         isActive: true,
       },
+      select: [
+        'id',
+        'displayName',
+        'description',
+        'library',
+        'version',
+        'imageKey',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+        'libraryS3Url',
+      ],
       relations: [
         'activityTemplates',
         'activityTemplates.arguments',
@@ -166,29 +217,63 @@ export class ActivityPackagesService {
 
   // Create Package
   async createPackage(dto: CreatePackageDto, userId?: number): Promise<ActivityPackage> {
-    const existing = await this.packageRepository.findOne({ where: { id: dto.id } });
-    if (existing) {
-      throw new BadRequestException(`Package with ID ${dto.id} already exists`);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const existing = await queryRunner.manager.findOne(ActivityPackage, { where: { id: dto.id } });
+      if (existing) {
+        throw new BadRequestException(`Package with ID ${dto.id} already exists`);
+      }
+
+      const pkg = queryRunner.manager.create(ActivityPackage, {
+        ...dto,
+        isActive: true,
+        createdBy: { id: userId } as any,
+      });
+
+      const savedPackage = await queryRunner.manager.save(ActivityPackage, pkg);
+
+      await queryRunner.commitTransaction();
+      return savedPackage;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-
-    const pkg = this.packageRepository.create({
-      ...dto,
-      isActive: true,
-      createdBy: { id: userId } as any,
-    });
-
-    return this.packageRepository.save(pkg);
   }
 
   // Get Package Details
   async getPackage(id: string): Promise<ActivityPackage> {
     const pkg = await this.packageRepository.findOne({
       where: { id },
+      select: [
+        'id',
+        'displayName',
+        'description',
+        'library',
+        'version',
+        'imageKey',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+        'libraryFileName',
+        'libraryVersion',
+        'parseStatus',
+        'parseError',
+        'libraryS3Url',
+      ],
       relations: ['activityTemplates', 'activityTemplates.arguments', 'createdBy'],
     });
 
     if (!pkg) {
       throw new NotFoundException('Package not found');
+    }
+
+    if (pkg.imageKey) {
+      pkg.imageUrl = this.s3Service.getS3Url(pkg.imageKey);
     }
 
     return pkg;
@@ -210,7 +295,8 @@ export class ActivityPackagesService {
 
     // 2. Upload to S3
     const s3Key = `libraries/${pkg.id}/${dto.libraryVersion}/${fileName}`;
-    const s3Url = await this.s3Service.uploadFile(s3Key, file.buffer as any, file.mimetype);
+    await this.s3Service.uploadFile(s3Key, file.buffer as any, file.mimetype);
+    const s3Url = this.s3Service.getS3URI(s3Key);
 
     // 3. Parse if it's a Python file
     let parsedData = null;
@@ -347,7 +433,10 @@ export class ActivityPackagesService {
       
       await this.generateTemplatesFromKeywords(pkg, parsedData.keywords);
       
-      return pkg;
+      if (pkg.imageKey) {
+      pkg.imageUrl = this.s3Service.getS3Url(pkg.imageKey);
+    }
+    return pkg;
     } catch (error) {
       pkg.parseStatus = ParseStatus.FAILED;
       pkg.parseError = error.message;
@@ -511,5 +600,26 @@ export class ActivityPackagesService {
   async deleteTemplate(packageId: string, templateId: string): Promise<void> {
     const template = await this.getTemplate(packageId, templateId);
     await this.templateRepository.remove(template);
+  }
+
+  // Upload Image
+  async uploadImage(packageId: string, file: Express.Multer.File): Promise<ActivityPackageResponseDto> {
+    const pkg = await this.getPackage(packageId);
+
+    // Upload to S3
+    const fileType = file.originalname.split('.').pop() || 'png';
+    const s3Key = `images/packages/${packageId}/icon.${fileType}`;
+    
+    // Explicit content type
+    const contentType = file.mimetype;
+    
+    await this.s3Service.uploadFile(s3Key, file.buffer as any, contentType);
+
+    pkg.imageKey = s3Key;
+    await this.packageRepository.save(pkg);
+
+    // Return with URL
+    pkg.imageUrl = this.s3Service.getS3Url(s3Key);
+    return plainToInstance(ActivityPackageResponseDto, pkg);
   }
 }

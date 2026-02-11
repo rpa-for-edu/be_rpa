@@ -417,8 +417,9 @@ export class ConnectionService {
     createMoodleDto: CreateMoodleConnectionDto,
   ): Promise<Connection> {
     // Verify Moodle connection
+    const sanitizedBaseUrl = createMoodleDto.baseUrl.replace(/\/+$/, '');
     const isValid = await this.moodleService.verifyConnection({
-      baseUrl: createMoodleDto.baseUrl,
+      baseUrl: sanitizedBaseUrl,
       token: createMoodleDto.token,
     });
 
@@ -431,12 +432,12 @@ export class ConnectionService {
     if (!connectionName) {
       try {
         const siteInfo = await this.moodleService.getSiteInfo({
-          baseUrl: createMoodleDto.baseUrl,
+          baseUrl: sanitizedBaseUrl,
           token: createMoodleDto.token,
         });
-        connectionName = siteInfo.sitename || createMoodleDto.baseUrl;
+        connectionName = siteInfo.sitename || sanitizedBaseUrl;
       } catch (error) {
-        connectionName = createMoodleDto.baseUrl;
+        connectionName = sanitizedBaseUrl;
       }
     }
 
@@ -457,7 +458,7 @@ export class ConnectionService {
       provider: AuthorizationProvider.MOODLE,
       userId,
       name: connectionName,
-      accessToken: createMoodleDto.baseUrl,
+      accessToken: sanitizedBaseUrl,
       refreshToken: createMoodleDto.token,
     });
 
@@ -506,10 +507,21 @@ export class ConnectionService {
     createERPNextDto: CreateERPNextConnectionDto,
   ): Promise<Connection> {
     // Verify ERPNext connection
+    const envBaseUrl = this.configService.get<string>('ERP_BASE_URL');
+    const sanitizedBaseUrl = (envBaseUrl || createERPNextDto.baseUrl).replace(/\/+$/, '');
+    let authHeader = createERPNextDto.token;
+    if (!authHeader.startsWith('Bearer ') && !authHeader.startsWith('token ')) {
+      if (authHeader.includes(':')) {
+        authHeader = `token ${authHeader}`;
+      } else {
+        authHeader = `Bearer ${authHeader}`;
+      }
+    }
+
     try {
-      await axios.get(`${createERPNextDto.baseUrl}/api/method/frappe.auth.get_logged_user`, {
+      await axios.get(`${sanitizedBaseUrl}/api/method/frappe.auth.get_logged_user`, {
         headers: {
-          Authorization: `token ${createERPNextDto.token}`,
+          Authorization: authHeader,
         },
       });
     } catch (error) {
@@ -532,13 +544,13 @@ export class ConnectionService {
     }
 
     // Store ERPNext credentials
-    // accessToken -> baseUrl
-    // refreshToken -> token
+    // accessToken -> token
+    // refreshToken -> token (redundant but required non-null)
     const connection = await this.connectionRepository.save({
       provider: AuthorizationProvider.ERP_Next,
       userId,
       name: connectionName,
-      accessToken: createERPNextDto.baseUrl,
+      accessToken: createERPNextDto.token,
       refreshToken: createERPNextDto.token,
       connectionKey: crypto.randomUUID(),
     });
@@ -567,10 +579,25 @@ export class ConnectionService {
     }
 
     try {
-      // Use stored baseUrl and token
-      await axios.get(`${connection.accessToken}/api/method/frappe.auth.get_logged_user`, {
+      // Use stored baseUrl and token, sanitizing the URL
+      const envBaseUrl = this.configService.get<string>('ERP_BASE_URL');
+      if (!envBaseUrl) {
+        throw new Error('ERP_BASE_URL is not configured');
+      }
+      const baseUrl = envBaseUrl.replace(/\/+$/, '');
+      
+      let authHeader = connection.accessToken;
+      if (!authHeader.startsWith('Bearer ') && !authHeader.startsWith('token ')) {
+        if (authHeader.includes(':')) {
+           authHeader = `token ${authHeader}`;
+        } else {
+           authHeader = `Bearer ${authHeader}`;
+        }
+      }
+      
+      await axios.get(`${baseUrl}/api/method/frappe.auth.get_logged_user`, {
         headers: {
-          Authorization: `token ${connection.refreshToken}`,
+          Authorization: authHeader,
         },
       });
 

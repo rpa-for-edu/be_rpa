@@ -46,6 +46,8 @@ export class ActivityPackage {
   @Column({ nullable: true })
   imageKey: string; // Lưu trữ image trên CDN, VD: "activity-packages/google_workspace.png"
 
+  imageUrl?: string;
+
   @Column({ nullable: true })
   library: string; // VD: "RPA.Cloud.Google" (keep for backward compatibility)
 
