@@ -14,7 +14,15 @@ export class GoogleSheetsStrategy extends PassportStrategy(Strategy, 'google-she
       clientID: configService.get('GOOGLE_SHEETS_CLIENT_ID'),
       clientSecret: configService.get('GOOGLE_SHEETS_CLIENT_SECRET'),
       callbackURL: configService.get('GOOGLE_SHEETS_CALLBACK_URL'),
-      scope: ['https://www.googleapis.com/auth/spreadsheets', 'email', 'profile'],
+      scope: [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/drive.file',
+        'email',
+        'profile',
+      ],
+      accessType: 'offline',
+      prompt: 'consent',
     });
   }
 

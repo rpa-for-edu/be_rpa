@@ -108,7 +108,11 @@ export class GoogleCredentialService implements ICredentialService {
       client_id: process.env['GOOGLE_SHEETS_CLIENT_ID'],
       client_secret: process.env['GOOGLE_SHEETS_CLIENT_SECRET'],
       token_uri: 'https://oauth2.googleapis.com/token',
-      scopes: ['https://www.googleapis.com/auth/spreadsheets', 'email', 'profile'],
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/drive.file',
+      ],
     };
   }
 }
