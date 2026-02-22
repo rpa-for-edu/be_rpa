@@ -1,11 +1,10 @@
-version: '3.8'
 
 services:
   # =============================================
   # APPLICATION SERVICE
   # =============================================
   app:
-    image: ghcr.io/${GHCR_USERNAME:-rpa-for-edu}/be_rpa_app:latest
+    image: ${IMAGE_NAME:-ghcr.io/rpa-for-edu/be_rpa_app}:latest
     container_name: be_rpa_app
     restart: unless-stopped
     env_file:
