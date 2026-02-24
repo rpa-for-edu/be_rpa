@@ -12,8 +12,14 @@ export class ReturnValue {
   @Column({ nullable: true })
   description: string;
 
+  @Column({ name: 'description_vi', nullable: true })
+  descriptionVi: string;
+
   @Column({ nullable: true })
   displayName: string;
+
+  @Column({ name: 'display_name_vi', nullable: true })
+  displayNameVi: string;
 
   @OneToOne(() => ActivityTemplate, (template) => template.returnValue, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'activityTemplateId' })

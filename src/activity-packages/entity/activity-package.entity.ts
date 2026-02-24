@@ -40,8 +40,14 @@ export class ActivityPackage {
   @Column()
   displayName: string;
 
+  @Column({ name: 'display_name_vi', nullable: true })
+  displayNameVi: string;
+
   @Column({ nullable: true })
   description: string;
+
+  @Column({ name: 'description_vi', nullable: true })
+  descriptionVi: string;
 
   @Column({ nullable: true })
   imageKey: string; // Lưu trữ image trên CDN, VD: "activity-packages/google_workspace.png"

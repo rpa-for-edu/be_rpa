@@ -35,7 +35,9 @@ export class ActivityPackagesService {
       select: [
         'id',
         'displayName',
+        'displayNameVi',
         'description',
+        'descriptionVi',
         'library',
         'version',
         'imageKey',
@@ -77,7 +79,9 @@ export class ActivityPackagesService {
       select: [
         'id',
         'displayName',
+        'displayNameVi',
         'description',
+        'descriptionVi',
         'library',
         'version',
         'imageKey',
@@ -141,7 +145,9 @@ export class ActivityPackagesService {
       select: [
         'id',
         'displayName',
+        'displayNameVi',
         'description',
+        'descriptionVi',
         'library',
         'version',
         'imageKey',
@@ -252,7 +258,9 @@ export class ActivityPackagesService {
       select: [
         'id',
         'displayName',
+        'displayNameVi',
         'description',
+        'descriptionVi',
         'library',
         'version',
         'imageKey',

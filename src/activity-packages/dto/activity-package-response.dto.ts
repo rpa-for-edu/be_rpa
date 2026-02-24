@@ -11,6 +11,9 @@ export class ArgumentResponseDto {
   @ApiPropertyOptional()
   description?: string;
 
+  @ApiPropertyOptional()
+  descriptionVi?: string;
+
   @ApiProperty()
   type: string;
 
@@ -35,7 +38,13 @@ export class ReturnValueResponseDto {
   description?: string;
 
   @ApiPropertyOptional()
+  descriptionVi?: string;
+
+  @ApiPropertyOptional()
   displayName?: string;
+
+  @ApiPropertyOptional()
+  displayNameVi?: string;
 }
 
 export class ActivityTemplateResponseDto {
@@ -46,7 +55,13 @@ export class ActivityTemplateResponseDto {
   name: string;
 
   @ApiPropertyOptional()
+  nameVi?: string;
+
+  @ApiPropertyOptional()
   description?: string;
+
+  @ApiPropertyOptional()
+  descriptionVi?: string;
 
   @ApiProperty()
   keyword: string;
@@ -83,7 +98,13 @@ export class ActivityPackageResponseDto {
   displayName: string;
 
   @ApiPropertyOptional()
+  displayNameVi?: string;
+
+  @ApiPropertyOptional()
   description?: string;
+
+  @ApiPropertyOptional()
+  descriptionVi?: string;
 
   @ApiPropertyOptional()
   imageKey?: string;
