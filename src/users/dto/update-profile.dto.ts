@@ -1,7 +1,13 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import { Language } from '../entity/user.entity';
 
 export class UpdateProfileDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name?: string;
+
+  @IsOptional()
+  @IsEnum(Language)
+  language?: Language;
 }

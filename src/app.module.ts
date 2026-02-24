@@ -27,7 +27,9 @@ import { S3Module } from './common/modules/s3.module';
 const ENV_FILE_PATH =
   process.env.NODE_ENV === 'production'
     ? resolve(__dirname, '../../env/.env.production')
-    : resolve(__dirname, '../../env/.env');
+    : process.env.NODE_ENV === 'azure'
+      ? resolve(__dirname, '../../env/.env.azure')
+      : resolve(__dirname, '../../env/.env');
 
 @Module({
   imports: [

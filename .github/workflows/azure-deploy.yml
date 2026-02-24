@@ -47,7 +47,7 @@
 #         uses: actions/checkout@v4
 
 #       - name: Create .env File
-#         run: echo "${{ secrets.ENV_FILE }}" > .env
+#         run: echo "${{ secrets.AZURE_ENV_FILE }}" > .env
 
 #       - name: Copy Files to Azure VM
 #         uses: appleboy/scp-action@v0.1.7
@@ -56,7 +56,7 @@
 #           username: ${{ secrets.AZURE_USER }}
 #           key: ${{ secrets.AZURE_SSH_KEY }}
 #           port: ${{ secrets.AZURE_SSH_PORT || 22 }}
-#           source: '.env,docker-compose.yml'
+#           source: '.env,docker-compose.yml,scripts/'
 #           target: /home/${{ secrets.AZURE_USER }}/be_rpa_app
 
 #       - name: SSH and Deploy
@@ -80,10 +80,6 @@
 
 #             # Restart app container
 #             docker compose up -d app
-
-#             # Initial migration check
-#             echo "Checking for pending migrations..."
-#             docker compose exec -T app node node_modules/typeorm/cli.js migration:run -d dist/config/mysql.datasource.js || echo "Migration warning: Check logs if needed"
 
 #             # Clean up unused images
 #             docker image prune -f

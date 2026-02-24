@@ -25,7 +25,7 @@ jobs:
             echo "Running Database Migration..."
             cd /home/${{ secrets.AZURE_USER }}/be_rpa_app
             
-            # Run migration inside the container using compiled code
-            docker compose exec -T app node node_modules/typeorm/cli.js migration:run -d dist/config/mysql.datasource.js
+            # Run migration inside the container
+            docker compose exec -T app npm run migration:run
             
             echo "Migration completed successfully!"

@@ -12,6 +12,11 @@ export enum UserRole {
   ADMIN = 'admin',
 }
 
+export enum Language {
+  VI = 'vi',
+  EN = 'en',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -56,6 +61,13 @@ export class User {
     default: UserRole.USER,
   })
   role: UserRole;
+
+  @Column({
+    type: 'enum',
+    enum: Language,
+    default: Language.VI,
+  })
+  language: Language;
 
   @OneToMany(() => ProcessVersion, (processVersion) => processVersion.creator)
   processVersions: ProcessVersion[];
