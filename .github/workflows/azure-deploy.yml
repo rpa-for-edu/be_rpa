@@ -56,7 +56,7 @@ jobs:
           username: ${{ secrets.AZURE_USER }}
           key: ${{ secrets.AZURE_SSH_KEY }}
           port: ${{ secrets.AZURE_SSH_PORT || 22 }}
-          source: '.env,docker-compose.yml'
+          source: '.env,docker-compose.yml,scripts/'
           target: /home/${{ secrets.AZURE_USER }}/be_rpa_app
 
       - name: SSH and Deploy

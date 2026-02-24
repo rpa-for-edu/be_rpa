@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuthenticationProvider, User } from './entity/user.entity';
+import { AuthenticationProvider, Language, User } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { EmailAlreadyExistsException, FileTooLargeException } from 'src/common/exceptions';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -9,6 +9,7 @@ import {
   PutObjectCommand, 
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
+import * as path from 'path';
 
 export type UserCreate = Pick<User, 'name' | 'email' | 'hashedPassword'>;
 export type UserFromProvider = Pick<User, 'name' | 'email' | 'avatarUrl' | 'provider' | 'providerId'>;
@@ -33,7 +34,13 @@ export class UsersService {
     private usersRepository: Repository<User>,
     private configService: ConfigService,
   ) {
-    this.s3Client = new S3Client({ region: configService.get('AWS_REGION') });
+    this.s3Client = new S3Client({
+      region: configService.get('AWS_REGION_EXTRA'),
+      credentials: {
+        accessKeyId: configService.get('AWS_KEY_ID'),
+        secretAccessKey: configService.get('AWS_SECRET_KEY'),
+      },
+    });
   }
 
   async findOneByEmail(email: string, options?: {
@@ -86,7 +93,12 @@ export class UsersService {
     if (!user) {
       return null;
     }
-    user.name = updateProfileDto.name;
+    if (updateProfileDto.name) {
+      user.name = updateProfileDto.name;
+    }
+    if (updateProfileDto.language) {
+      user.language = updateProfileDto.language;
+    }
     return this.usersRepository.save(user);
   }
 
@@ -102,17 +114,20 @@ export class UsersService {
       throw new FileTooLargeException();
     }
 
-    const bucket = this.configService.get('AWS_S3_PUBLIC_BUCKET_NAME');
-    const region = this.configService.get('AWS_REGION');
+    const bucket = this.configService.get('AWS_S3_ROBOT_BUCKET_NAME');
+    const region = this.configService.get('AWS_REGION_EXTRA');
+    const ext = path.extname(file.originalname);
+    const key = `avatars/${userId}${ext}`;
+
     const command = new PutObjectCommand({
       Bucket: bucket,
-      Key: `avatars/${userId}`,
+      Key: key,
       Body: file.buffer,
       ContentType: file.mimetype,
     });
     await this.s3Client.send(command);
 
-    user.avatarUrl = `https://${bucket}.s3.${region}.amazonaws.com/avatars/${userId}`;
+    user.avatarUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
     return this.usersRepository.save(user);
   }
 }

@@ -61,8 +61,6 @@ services:
       - mysql
     networks:
       - rpa_network
-    profiles:
-      - dev
 
 volumes:
   mysql_data:
