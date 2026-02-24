@@ -81,10 +81,6 @@ jobs:
             # Restart app container
             docker compose up -d app
 
-            # Initial migration check
-            echo "Checking for pending migrations..."
-            docker compose exec -T app node node_modules/typeorm/cli.js migration:run -d dist/config/mysql.datasource.js || echo "Migration warning: Check logs if needed"
-
             # Clean up unused images
             docker image prune -f
 
