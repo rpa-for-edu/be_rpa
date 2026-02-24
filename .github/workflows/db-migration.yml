@@ -26,6 +26,6 @@ jobs:
             cd /home/${{ secrets.AZURE_USER }}/be_rpa_app
             
             # Run migration in a temporary container
-            docker compose run --rm app npm run migration:run
+            docker compose run --rm app npx typeorm migration:run -d dist/config/mysql.datasource.js
             
             echo "Migration completed successfully!"
