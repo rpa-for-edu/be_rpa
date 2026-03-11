@@ -64,6 +64,7 @@ export class ConnectionService {
         name: createConnectionDto.email ? createConnectionDto.email : Date.now().toString(),
         accessToken: createConnectionDto.accessToken,
         refreshToken: createConnectionDto.refreshToken,
+        connectionKey: crypto.randomUUID(),
       });
       return connection;
     } else {
@@ -153,7 +154,7 @@ export class ConnectionService {
 
     if (!googleProviders.includes(provider)) {
       throw new BadRequestException(
-        `Refresh token is not supported for ${provider}. This provider uses token-based authentication.`
+        `Refresh token is not supported for ${provider}. This provider uses token-based authentication.`,
       );
     }
 
@@ -278,7 +279,7 @@ export class ConnectionService {
     });
     let connections = robotConnectionsMapping.map((conn) => {
       let credentialData;
-      
+
       // Special handling for Moodle and ERPNext
       if (
         conn.connection.provider === AuthorizationProvider.MOODLE ||
@@ -306,32 +307,32 @@ export class ConnectionService {
 
   async getScopedConnectionForSimulation(connectionKey: string[]) {
     const { connections } = await this.getConnectionByConnectionKey(connectionKey);
-    if (!connections ) {
+    if (!connections) {
       throw new ConnectionNotFoundException();
-    } 
+    }
     let result = [];
     let credentialData;
     // Special handling for Moodle and ERPNext
     connections.forEach((connection) => {
-    if (
-      connection.provider === AuthorizationProvider.MOODLE ||
-      connection.provider === AuthorizationProvider.ERP_Next
-    ) {
-      credentialData = {
-        access_token: connection.accessToken, // baseUrl
-        refresh_token: connection.refreshToken, // Moodle/ERPNext token
-        ...(connection.provider === AuthorizationProvider.ERP_Next
-          ? { base_url: this.configService.get('ERP_BASE_URL') }
-          : {}),
-      };
-    } else {
-      // All other providers use GoogleCredentialService
-      credentialData = this.googleCredentialService.create(connection);
-    }
-    result.push({
-      fileName: ConnectionService.getCredentialFileName(connection.connectionKey),
-      data: credentialData,
-    });
+      if (
+        connection.provider === AuthorizationProvider.MOODLE ||
+        connection.provider === AuthorizationProvider.ERP_Next
+      ) {
+        credentialData = {
+          access_token: connection.accessToken, // baseUrl
+          refresh_token: connection.refreshToken, // Moodle/ERPNext token
+          ...(connection.provider === AuthorizationProvider.ERP_Next
+            ? { base_url: this.configService.get('ERP_BASE_URL') }
+            : {}),
+        };
+      } else {
+        // All other providers use GoogleCredentialService
+        credentialData = this.googleCredentialService.create(connection);
+      }
+      result.push({
+        fileName: ConnectionService.getCredentialFileName(connection.connectionKey),
+        data: credentialData,
+      });
     });
     return result;
   }
@@ -616,16 +617,16 @@ export class ConnectionService {
         throw new Error('ERP_BASE_URL is not configured');
       }
       const baseUrl = envBaseUrl.replace(/\/+$/, '');
-      
+
       let authHeader = connection.accessToken;
       if (!authHeader.startsWith('Bearer ') && !authHeader.startsWith('token ')) {
         if (authHeader.includes(':')) {
-           authHeader = `token ${authHeader}`;
+          authHeader = `token ${authHeader}`;
         } else {
-           authHeader = `Bearer ${authHeader}`;
+          authHeader = `Bearer ${authHeader}`;
         }
       }
-      
+
       await axios.get(`${baseUrl}/api/method/frappe.auth.get_logged_user`, {
         headers: {
           Authorization: authHeader,
