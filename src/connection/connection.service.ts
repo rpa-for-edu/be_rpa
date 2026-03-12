@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { GoogleService } from 'src/google/google.service';
-import crypto from 'crypto';
+import { randomUUID } from 'crypto';
 import { Robot } from 'src/robot/entity/robot.entity';
 import { GoogleCredentialService } from './service/google-credential.service';
 import { MoodleService } from './service/moodle.service';
@@ -64,7 +64,7 @@ export class ConnectionService {
         name: createConnectionDto.email ? createConnectionDto.email : Date.now().toString(),
         accessToken: createConnectionDto.accessToken,
         refreshToken: createConnectionDto.refreshToken,
-        connectionKey: crypto.randomUUID(),
+        connectionKey: randomUUID(),
       });
       return connection;
     } else {
@@ -584,7 +584,7 @@ export class ConnectionService {
       name: connectionName,
       accessToken: createERPNextDto.token,
       refreshToken: createERPNextDto.token,
-      connectionKey: crypto.randomUUID(),
+      connectionKey: randomUUID(),
     });
 
     return connection;
