@@ -36,7 +36,7 @@ export class RobotReportService {
     const latestLogSubQuery = this.robotRunLogRepository
       .createQueryBuilder('sub')
       .select('sub.process_id_version', 'process_id_version')
-      .addSelect('MAX(sub.created_date)', 'max_date')
+      .addSelect('MAX(sub.created_at)', 'max_date')
       .where('sub.user_id = :userIdStr', { userIdStr })
       .groupBy('sub.process_id_version');
 
@@ -49,7 +49,7 @@ export class RobotReportService {
         .innerJoin(
           `(${latestLogSubQuery.getQuery()})`,
           'latest',
-          'rrl.process_id_version = latest.process_id_version AND rrl.created_date = latest.max_date',
+          'rrl.process_id_version = latest.process_id_version AND rrl.created_at = latest.max_date',
         )
         .where('rrl.user_id = :userIdStr')
         .setParameters({ ...latestLogSubQuery.getParameters(), userIdStr })

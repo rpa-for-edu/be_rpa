@@ -16,11 +16,12 @@ export class NotificationService {
     private notificationRepository: Repository<Notification>,
     private configService: ConfigService,
   ) {
-    // this.pubnub = new PubNub({
-    //   subscribeKey: this.configService.get('PUBNUB_SUBSCRIBE_KEY'),
-    //   publishKey: this.configService.get('PUBNUB_PUBLISH_KEY'),
-    //   userId: this.configService.get('PUBNUB_USER_ID'),
-    // });
+   this.pubnub = new PubNub({
+  publishKey: process.env.PUBNUB_PUBLISH_KEY,
+  subscribeKey: process.env.PUBNUB_SUBSCRIBE_KEY,
+  secretKey: process.env.PUBNUB_SECRET_KEY,
+  userId: 'server',
+});
   }
 
   async getNotifications(
@@ -51,7 +52,6 @@ export class NotificationService {
   }
 
   async createNotification(createNotificationDto: CreateNotificationDto) {
-    return null;
     const notification = await this.notificationRepository.save({
       ...createNotificationDto,
     });
@@ -61,10 +61,21 @@ export class NotificationService {
     return notification;
   }
 
-  private async publishNotification(userId: number, notification: Notification) {
-    this.pubnub.publish({
+  private async publishNotification(userId: number, notification: any) {
+  try {
+    const res = await this.pubnub.publish({
       channel: `${this.privateNotiChannelPrefix}${userId}`,
       message: notification,
     });
+
+    console.log('PubNub success:', res);
+  } catch (err: any) {
+    console.error('PubNub error FULL:', err);
+
+    // log chi tiết hơn
+    if (err.status) {
+      console.error('Status:', err.status);
+    }
   }
+}
 }
