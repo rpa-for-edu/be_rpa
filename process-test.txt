@@ -1,0 +1,62 @@
+FAIL src/processes/processes.service.spec.ts (11.973 s)
+  ProcessesService
+    √ should be defined (10 ms)
+    getProcessesCount
+      √ should return the count of processes for a user (4 ms)
+    createProcess
+      √ should create a process and its initial version (3 ms)
+      √ should rollback process creation if version creation fails (17 ms)
+    getProcess
+      √ should throw ProcessNotFoundException if process not found (3 ms)
+      √ should return process details if process exists (2 ms)
+    updateProcess
+      √ should throw ProcessNotFoundException if process not found (2 ms)
+      √ should call update on repository (1 ms)
+    deleteProcess
+      √ should delete process and its detail (2 ms)
+      √ should return null if process not found (2 ms)
+    saveProcess
+      √ should throw ProcessNotFoundException if process not found (1 ms)
+      √ should update process details in mongo (2 ms)
+    shareProcess
+      √ should throw if process not found (1 ms)
+      √ should throw Forbidden if caller is already a shared user (2 ms)
+      × should share process and send notification (3 ms)
+    getSharedToOfProcess
+      √ should return shared array (1 ms)
+    createProcessAllParams
+      √ should save and create version (7 ms)
+    Version Management
+      √ createProcessVersionFromCurrent (4 ms)
+      √ restoreProcessVersion (3 ms)
+      √ getAllVersionsOfProcess (2 ms)
+      √ getProcessVersionDetail (2 ms)
+      √ deleteProcessVersion (2 ms)
+    Comments
+      √ addCommentToElement (2 ms)
+      √ getCommentsOfProcess (1 ms)
+
+  ● ProcessesService › shareProcess › should share process and send notification
+
+    TypeError: Cannot read properties of undefined (reading 'forEach')
+
+      229 |   processBeforeShare(processDetail: ProcessDetail) {
+      230 |     // remove the connection
+    > 231 |     processDetail.activities.forEach((activity) => {
+          |                              ^
+      232 |       for (const argumentName in activity.properties.arguments) {
+      233 |         if (argumentName === 'Connection') {
+      234 |           activity.properties.arguments[argumentName].value = '';
+
+      at ProcessesService.processBeforeShare (processes/processes.service.ts:231:30)
+      at ProcessesService.createSharedProcess (processes/processes.service.ts:224:10)
+      at processes/processes.service.ts:195:7
+          at async Promise.all (index 0)
+      at ProcessesService.shareProcess (processes/processes.service.ts:203:5)
+      at Object.<anonymous> (processes/processes.service.spec.ts:243:7)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 23 passed, 24 total
+Snapshots:   0 total
+Time:        12.049 s, estimated 14 s
+Ran all test suites matching /src\\processes\\processes.service.spec.ts/i.

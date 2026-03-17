@@ -916,7 +916,7 @@ export class WorkspaceService {
     }
 
     // return;
-    console.log('Updating role for memberId:', memberId, 'in teamId:', teamId);
+    // console.log('Updating role for memberId:', memberId, 'in teamId:', teamId);
 
     const member = await this.teamMemberRepository.findOne({
       where: { id: memberId, teamId },

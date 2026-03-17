@@ -1,0 +1,490 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "type": "row",
+      "title": "📊 Performance Overview",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Performance Overview (VUs / Avg req/s / Avg Duration / Avg P95)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_vus", "legendFormat": "VUs", "refId": "A" },
+        { "expr": "sum(rate(k6_http_reqs_total[1m]))", "legendFormat": "Avg req/s", "refId": "B" },
+        { "expr": "sum(rate(k6_http_reqs_total[1m])) * avg(k6_http_req_failed_rate)", "legendFormat": "Failure req/s", "refId": "B2" },
+        { "expr": "avg(k6_http_req_duration_avg)", "legendFormat": "Avg Duration (ms)", "refId": "C" },
+        { "expr": "avg(k6_http_req_duration_p95)", "legendFormat": "Avg P95 (ms)", "refId": "D" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "pointSize": 3, "spanNulls": true, "axisSoftMin": 0 },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "VUs" }, "properties": [{ "id": "custom.axisPlacement", "value": "right" }, { "id": "unit", "value": "short" }] },
+          { "matcher": { "id": "byName", "options": "Avg req/s" }, "properties": [{ "id": "unit", "value": "reqps" }] },
+          { "matcher": { "id": "byName", "options": "Failure req/s" }, "properties": [{ "id": "unit", "value": "reqps" }, { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 5] } }] },
+          { "matcher": { "id": "byName", "options": "Avg Duration (ms)" }, "properties": [{ "id": "unit", "value": "ms" }] },
+          { "matcher": { "id": "byName", "options": "Avg P95 (ms)" }, "properties": [{ "id": "unit", "value": "ms" }] }
+        ]
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 1 }
+    },
+    {
+      "type": "stat",
+      "title": "Active VUs",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "k6_vus", "legendFormat": "VUs" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 500 }, { "color": "red", "value": 900 }] } } },
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 9 }
+    },
+    {
+      "type": "stat",
+      "title": "Max VUs",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "k6_vus_max", "legendFormat": "Max VUs" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "blue", "value": null }] } } },
+      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 9 }
+    },
+    {
+      "type": "stat",
+      "title": "Request Rate",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "sum(rate(k6_http_reqs_total[30s]))", "legendFormat": "req/s" }],
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }] } } },
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 9 }
+    },
+    {
+      "type": "stat",
+      "title": "Avg Response",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "avg(k6_http_req_duration_avg)", "legendFormat": "avg" }],
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1000 }, { "color": "red", "value": 2000 }] } } },
+      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 9 }
+    },
+    {
+      "type": "stat",
+      "title": "Median Response",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "avg(k6_http_req_duration_med)", "legendFormat": "med" }],
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1000 }, { "color": "red", "value": 2000 }] } } },
+      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 9 }
+    },
+    {
+      "type": "stat",
+      "title": "P90 Latency",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "avg(k6_http_req_duration_p90)", "legendFormat": "p90" }],
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 2000 }, { "color": "red", "value": 5000 }] } } },
+      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 9 }
+    },
+    {
+      "type": "stat",
+      "title": "P95 Latency",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "avg(k6_http_req_duration_p95)", "legendFormat": "p95" }],
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 2000 }, { "color": "red", "value": 5000 }] } } },
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 9 }
+    },
+    {
+      "type": "stat",
+      "title": "P99 Latency",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "avg(k6_http_req_duration_p99)", "legendFormat": "p99" }],
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 3000 }, { "color": "red", "value": 8000 }] } } },
+      "gridPos": { "h": 4, "w": 3, "x": 21, "y": 9 }
+    },
+    {
+      "type": "stat",
+      "title": "Failure Rate",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "avg(k6_http_req_failed_rate)", "legendFormat": "fail %" }],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 13 }
+    },
+    {
+      "type": "stat",
+      "title": "Checks Pass Rate",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "avg(k6_checks_rate)", "legendFormat": "pass %" }],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.9 }, { "color": "green", "value": 0.99 }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 13 }
+    },
+    {
+      "type": "stat",
+      "title": "Total Requests",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "sum(increase(k6_http_reqs_total[5m]))", "legendFormat": "total" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "blue", "value": null }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 13 }
+    },
+    {
+      "type": "stat",
+      "title": "Data Received",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "sum(k6_data_received_total)", "legendFormat": "received" }],
+      "fieldConfig": { "defaults": { "unit": "decbytes", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "purple", "value": null }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 13 }
+    },
+    {
+      "type": "stat",
+      "title": "Data Sent",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "sum(k6_data_sent_total)", "legendFormat": "sent" }],
+      "fieldConfig": { "defaults": { "unit": "decbytes", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "orange", "value": null }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 13 }
+    },
+
+    {
+      "type": "row",
+      "title": "📈 Response Time (HTTP Duration)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Request Duration (All Percentiles)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_http_req_duration_min", "legendFormat": "min", "refId": "A" },
+        { "expr": "k6_http_req_duration_avg", "legendFormat": "avg", "refId": "B" },
+        { "expr": "k6_http_req_duration_med", "legendFormat": "med", "refId": "C" },
+        { "expr": "k6_http_req_duration_p90", "legendFormat": "p90", "refId": "D" },
+        { "expr": "k6_http_req_duration_p95", "legendFormat": "p95", "refId": "E" },
+        { "expr": "k6_http_req_duration_p99", "legendFormat": "p99", "refId": "F" },
+        { "expr": "k6_http_req_duration_max", "legendFormat": "max", "refId": "G" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "pointSize": 3, "spanNulls": true } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "min", "max", "lastNotNull"] } },
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 14 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Response Time by Endpoint (Avg)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_get_user_me_duration_avg", "legendFormat": "/users/me", "refId": "A" },
+        { "expr": "k6_get_connection_duration_avg", "legendFormat": "/connection", "refId": "B" },
+        { "expr": "k6_get_workspace_duration_avg", "legendFormat": "/workspace", "refId": "C" },
+        { "expr": "k6_get_processes_duration_avg", "legendFormat": "/processes", "refId": "D" },
+        { "expr": "k6_get_robots_duration_avg", "legendFormat": "/robot", "refId": "E" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "pointSize": 3, "spanNulls": true } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "min", "max", "lastNotNull"] } },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 14 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Response Time by Endpoint (P95)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_get_user_me_duration_p95", "legendFormat": "/users/me P95", "refId": "A" },
+        { "expr": "k6_get_connection_duration_p95", "legendFormat": "/connection P95", "refId": "B" },
+        { "expr": "k6_get_workspace_duration_p95", "legendFormat": "/workspace P95", "refId": "C" },
+        { "expr": "k6_get_processes_duration_p95", "legendFormat": "/processes P95", "refId": "D" },
+        { "expr": "k6_get_robots_duration_p95", "legendFormat": "/robot P95", "refId": "E" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "pointSize": 3, "spanNulls": true } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "min", "max", "lastNotNull"] } },
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 24 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Response Time by Endpoint (Min / Max)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_get_user_me_duration_min", "legendFormat": "/users/me min", "refId": "A1" },
+        { "expr": "k6_get_user_me_duration_max", "legendFormat": "/users/me max", "refId": "A2" },
+        { "expr": "k6_get_connection_duration_min", "legendFormat": "/connection min", "refId": "B1" },
+        { "expr": "k6_get_connection_duration_max", "legendFormat": "/connection max", "refId": "B2" },
+        { "expr": "k6_get_workspace_duration_min", "legendFormat": "/workspace min", "refId": "C1" },
+        { "expr": "k6_get_workspace_duration_max", "legendFormat": "/workspace max", "refId": "C2" },
+        { "expr": "k6_get_processes_duration_min", "legendFormat": "/processes min", "refId": "D1" },
+        { "expr": "k6_get_processes_duration_max", "legendFormat": "/processes max", "refId": "D2" },
+        { "expr": "k6_get_robots_duration_min", "legendFormat": "/robot min", "refId": "E1" },
+        { "expr": "k6_get_robots_duration_max", "legendFormat": "/robot max", "refId": "E2" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 5, "pointSize": 3, "spanNulls": true } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "min", "max", "lastNotNull"] } },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 24 }
+    },
+
+    {
+      "type": "row",
+      "title": "🔄 Throughput & Concurrency",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Virtual Users Over Time",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_vus", "legendFormat": "Active VUs", "refId": "A" },
+        { "expr": "k6_vus_max", "legendFormat": "Max VUs", "refId": "B" }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 20, "gradientMode": "scheme", "spanNulls": true }, "color": { "mode": "palette-classic" } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "min", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 35 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Throughput (Requests per Second)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "rate(k6_http_reqs_total[30s])", "legendFormat": "Total req/s", "refId": "A" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 25, "gradientMode": "scheme", "spanNulls": true }, "color": { "fixedColor": "blue", "mode": "fixed" } }
+      },
+      "options": { "tooltip": { "mode": "single" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "min", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 35 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Iterations per Second",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "rate(k6_iterations_total[30s])", "legendFormat": "iterations/s", "refId": "A" },
+        { "expr": "k6_iteration_duration_avg", "legendFormat": "iteration duration avg (ms)", "refId": "B" }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 25, "gradientMode": "scheme", "spanNulls": true }, "color": { "mode": "palette-classic" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "iteration duration avg (ms)" }, "properties": [{ "id": "custom.axisPlacement", "value": "right" }, { "id": "unit", "value": "ms" }] }
+        ]
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "min", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 35 }
+    },
+
+    {
+      "type": "row",
+      "title": "❌ Errors & Checks",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 43 },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "HTTP Error Rate",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "k6_http_req_failed_rate", "legendFormat": "fail rate" }],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.01 }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 44 }
+    },
+    {
+      "type": "stat",
+      "title": "Custom Error Rate",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_errors_rate", "legendFormat": "errors (NF-P01)" },
+        { "expr": "k6_error_rate_rate", "legendFormat": "errors (NF-P02)" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.01 }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 44 }
+    },
+    {
+      "type": "stat",
+      "title": "Checks Pass Rate",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "k6_checks_rate", "legendFormat": "pass rate" }],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.9 }, { "color": "green", "value": 0.99 }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 44 }
+    },
+    {
+      "type": "stat",
+      "title": "Total Requests",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "sum(increase(k6_http_reqs_total[5m]))", "legendFormat": "total reqs" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "blue", "value": null }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 44 }
+    },
+    {
+      "type": "stat",
+      "title": "Data Received",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "k6_data_received_total", "legendFormat": "received" }],
+      "fieldConfig": { "defaults": { "unit": "decbytes", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "purple", "value": null }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 44 }
+    },
+    {
+      "type": "stat",
+      "title": "Data Sent",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "k6_data_sent_total", "legendFormat": "sent" }],
+      "fieldConfig": { "defaults": { "unit": "decbytes", "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "orange", "value": null }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 44 }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Failure Rate Over Time",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_http_req_failed_rate", "legendFormat": "HTTP Fail Rate", "refId": "A" },
+        { "expr": "k6_errors_rate", "legendFormat": "Custom Errors (NF-P01)", "refId": "B" },
+        { "expr": "k6_error_rate_rate", "legendFormat": "Custom Errors (NF-P02)", "refId": "C" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "percentunit", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15, "spanNulls": true }, "color": { "mode": "palette-classic" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.01 }] }
+        }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 48 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Checks Pass Rate Over Time",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_checks_rate", "legendFormat": "Check Pass Rate", "refId": "A" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "percentunit", "min": 0, "max": 1, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15, "spanNulls": true }, "color": { "fixedColor": "green", "mode": "fixed" } }
+      },
+      "options": { "tooltip": { "mode": "single" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "min", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 48 }
+    },
+
+    {
+      "type": "row",
+      "title": "🌐 HTTP Timing Breakdown",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 56 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Timing Phases (Avg)",
+      "description": "Breakdown: Blocked → Connecting → TLS → Sending → Waiting (TTFB) → Receiving",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_http_req_blocked_avg", "legendFormat": "Blocked", "refId": "A" },
+        { "expr": "k6_http_req_connecting_avg", "legendFormat": "Connecting", "refId": "B" },
+        { "expr": "k6_http_req_tls_handshaking_avg", "legendFormat": "TLS Handshaking", "refId": "C" },
+        { "expr": "k6_http_req_sending_avg", "legendFormat": "Sending", "refId": "D" },
+        { "expr": "k6_http_req_waiting_avg", "legendFormat": "Waiting (TTFB)", "refId": "E" },
+        { "expr": "k6_http_req_receiving_avg", "legendFormat": "Receiving", "refId": "F" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "custom": { "drawStyle": "bars", "lineWidth": 1, "fillOpacity": 80, "stacking": { "mode": "normal" }, "spanNulls": true } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "lastNotNull"] } },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 57 }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Timing Phases (P95)",
+      "description": "P95 breakdown of each connection phase",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_http_req_blocked_p95", "legendFormat": "Blocked P95", "refId": "A" },
+        { "expr": "k6_http_req_connecting_p95", "legendFormat": "Connecting P95", "refId": "B" },
+        { "expr": "k6_http_req_tls_handshaking_p95", "legendFormat": "TLS P95", "refId": "C" },
+        { "expr": "k6_http_req_sending_p95", "legendFormat": "Sending P95", "refId": "D" },
+        { "expr": "k6_http_req_waiting_p95", "legendFormat": "Waiting P95", "refId": "E" },
+        { "expr": "k6_http_req_receiving_p95", "legendFormat": "Receiving P95", "refId": "F" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "custom": { "drawStyle": "bars", "lineWidth": 1, "fillOpacity": 80, "stacking": { "mode": "normal" }, "spanNulls": true } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "lastNotNull"] } },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 57 }
+    },
+
+    {
+      "type": "row",
+      "title": "📡 Data Transfer",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 66 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Data Transfer Rate",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "rate(k6_data_received_total[30s])", "legendFormat": "Data Received/s", "refId": "A" },
+        { "expr": "rate(k6_data_sent_total[30s])", "legendFormat": "Data Sent/s", "refId": "B" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "Bps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 20, "spanNulls": true }, "color": { "mode": "palette-classic" } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 67 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Cumulative Data Transfer",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "k6_data_received_total", "legendFormat": "Total Received", "refId": "A" },
+        { "expr": "k6_data_sent_total", "legendFormat": "Total Sent", "refId": "B" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "decbytes", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "spanNulls": true }, "color": { "mode": "palette-classic" } }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 67 }
+    },
+
+    {
+      "type": "row",
+      "title": "🔗 Successful Requests (Custom: NF-P02)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 75 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Successful Requests (NF-P02 Throughput Counter)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "rate(k6_successful_requests_total[30s])", "legendFormat": "successful req/s", "refId": "A" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 20, "spanNulls": true }, "color": { "fixedColor": "green", "mode": "fixed" } }
+      },
+      "options": { "tooltip": { "mode": "single" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 76 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Total Requests (NF-P01 Counter)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "rate(k6_total_requests_total[30s])", "legendFormat": "total req/s (custom)", "refId": "A" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 20, "spanNulls": true }, "color": { "fixedColor": "orange", "mode": "fixed" } }
+      },
+      "options": { "tooltip": { "mode": "single" }, "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "lastNotNull"] } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 76 }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["k6", "performance", "NF-P01", "NF-P02"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "k6 Performance Test - Full Metrics",
+  "uid": "k6-full-metrics"
+}

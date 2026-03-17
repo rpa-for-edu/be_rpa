@@ -283,7 +283,7 @@ export class WorkspaceRobotsService {
         status: 'running',
       };
     } catch (error) {
-      console.error('Failed to run robot', error);
+      // console.error('Failed to run robot', error);
       throw new HttpException('Failed to start robot', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

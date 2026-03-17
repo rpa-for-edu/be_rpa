@@ -107,6 +107,48 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/email/",
+      "<rootDir>/google-forms/",
+      "<rootDir>/google/",
+      "<rootDir>/notification/",
+      "<rootDir>/connection/",
+      "<rootDir>/activity-packages/",
+      "<rootDir>/robot-report/",
+      "<rootDir>/document-template/",
+      "<rootDir>/common/",
+      "<rootDir>/constants/",
+      "<rootDir>/log/",
+      "<rootDir>/auth/",
+      "<rootDir>/main\\.ts$",
+      ".*\\.module\\.ts$",
+      ".*\\.dto\\.ts$",
+      ".*\\.entity\\.ts$",
+      ".*\\.schema\\.ts$",
+      ".*\\.decorator\\.ts$",
+      ".*\\.guard\\.ts$",
+      ".*\\.strategy\\.ts$",
+      ".*\\.interceptor\\.ts$",
+      ".*\\.middleware\\.ts$",
+      ".*\\.filter\\.ts$",
+      ".*\\.pipe\\.ts$",
+      ".*\\.controller\\.ts$",
+      ".*/entity/.*",
+      ".*/dto/.*",
+      ".*gateway\\.ts$",
+      ".*/constants/.*"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 75,
+        "functions": 75,
+        "lines": 75,
+        "statements": 75
+      }
+    },
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
