@@ -69,6 +69,7 @@ export class RobotService {
     const process = await this.processRepository.findOne({
       where: { id: createRobotDto.processId, userId },
     });
+    await this.processRepository.update({ id: createRobotDto.processId, userId }, { status: 'Published' });
     if (!process) {
       throw new ProcessNotFoundException();
     }
@@ -129,7 +130,7 @@ export class RobotService {
     }
     // terminate AWS resources
     await this.terminateRobotResources(robot);
-
+    await this.processRepository.update({ id: robot.processId, userId }, { status: 'Draft' });
     // delete from DB
     await this.robotRepository.delete({ userId, robotKey });
   }

@@ -7,6 +7,7 @@ GRANT ALL PRIVILEGES ON report.* TO 'report_agent'@'%';
 FLUSH PRIVILEGES;
 
 CREATE TABLE report.robot_run_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     instance_id VARCHAR(50),
     process_id_version VARCHAR(50),
     user_id VARCHAR(10),

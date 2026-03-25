@@ -85,4 +85,7 @@ export class Process {
 
   @OneToMany(() => CommentEntity, (comment) => comment.process)
   comments: CommentEntity[];
+
+  @Column({ nullable: true })
+  status: string;
 }

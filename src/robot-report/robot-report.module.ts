@@ -3,12 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RobotRunDetail } from './entity/robot-run-detail.entity'; // Ensure the correct import path
 import { RobotRunLog } from './entity/robot-run-log.entity';
 import { RobotRunOverall } from './entity/robot-run-overall.entity';
+import { Robot } from 'src/robot/entity/robot.entity';
 import { RobotReportService } from './robot-report.service';
 import { RobotReportController } from './robot-report.controller';
 import { RobotReportRealtimeGateway } from './robot-report.gateway';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RobotRunDetail, RobotRunLog, RobotRunOverall])],
+  imports: [TypeOrmModule.forFeature([RobotRunDetail, RobotRunLog, RobotRunOverall, Robot])],
   providers: [RobotReportService, RobotReportRealtimeGateway],
   controllers: [RobotReportController],
 })

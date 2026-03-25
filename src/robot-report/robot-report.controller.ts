@@ -3,12 +3,43 @@ import { RobotReportService } from './robot-report.service';
 import { UserDecor } from 'src/common/decorators/user.decorator';
 import { UserPayload } from 'src/auth/strategy/jwt.strategy';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { DashboardQueryDto } from './dto/dashboard-query.dto';
+import { AllStatusesResponseDto } from './dto/all-statuses-response.dto';
+import { JobsHistoryResponseDto } from './dto/jobs-history-response.dto';
+import { TransactionsResponseDto } from './dto/transactions-response.dto';
 
 @Controller('robot-report')
 @ApiTags('robot-report')
 @ApiBearerAuth()
 export class RobotReportController {
   constructor(private readonly robotRunDetailService: RobotReportService) {}
+
+  // ─── Dashboard Endpoints ──────────────────────────────────
+
+  @Get('/dashboard/all-statuses')
+  async getDashboardAllStatuses(
+    @UserDecor() user: UserPayload,
+  ): Promise<AllStatusesResponseDto> {
+    return this.robotRunDetailService.getAllStatuses(user.id);
+  }
+
+  @Get('/dashboard/jobs-history')
+  async getDashboardJobsHistory(
+    @UserDecor() user: UserPayload,
+    @Query() query: DashboardQueryDto,
+  ): Promise<JobsHistoryResponseDto> {
+    return this.robotRunDetailService.getDashboardJobsHistory(user.id, query.date);
+  }
+
+  @Get('/dashboard/transactions')
+  async getDashboardTransactions(
+    @UserDecor() user: UserPayload,
+    @Query() query: DashboardQueryDto,
+  ): Promise<TransactionsResponseDto> {
+    return this.robotRunDetailService.getDashboardTransactions(user.id, query.date);
+  }
+
+  // ─── Existing Endpoints ──────────────────────────────────
 
   @Get('/detail')
   async fetchRobotRunDetails(

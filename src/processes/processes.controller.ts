@@ -87,6 +87,15 @@ export class ProcessesController {
     return await this.processesService.deleteProcess(user.id, processId);
   }
 
+  @ApiBody({
+    type: [String],
+    description: 'Emails to share the process with',
+    examples: {
+      example1: {
+        value: ['minhchien662004@gmail.com'],
+      },
+    },
+  })
   @Post('/:id/share')
   async shareProcess(
     @UserDecor() user: UserPayload,
