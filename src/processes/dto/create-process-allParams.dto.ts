@@ -4,4 +4,5 @@ import { CreateProcessDto } from './create-process.dto';
 export class CreateProcessAllParamsDto extends PartialType(CreateProcessDto) {
   variables: any;
   activities: Array<any>;
+  sharedByUserId?: number;
 }

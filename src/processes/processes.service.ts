@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, InternalServerErrorException } from '@n
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Model } from 'mongoose';
-import { Process } from 'src/processes/entity/process.entity';
+import { Process, ProcessScope } from 'src/processes/entity/process.entity';
 import { ProcessDetail, ProcessForValidation } from 'src/processes/schema/process.schema';
 import { DataSource, Repository } from 'typeorm';
 import { ProcessesValidateService } from './processes-validate.service';
@@ -69,6 +69,7 @@ export class ProcessesService {
     const processEntity = await this.processRepository.save({
       ...createProcessDto,
       userId,
+      scope: ProcessScope.PERSONAL,
     });
     try {
       await this.createProcessVersion(userId, {
@@ -193,6 +194,8 @@ export class ProcessesService {
         throw new UserNotFoundException();
       }
       await this.createSharedProcess(process, user.id);
+      console.log('Send notification to ' + userId);
+
       await this.notificationService.createNotification({
         title: `Process has been shared with you`,
         content: `Process ${process.name} has been shared with you by ${process.user.email}`,
@@ -204,26 +207,30 @@ export class ProcessesService {
   }
 
   private async createSharedProcess(process: Process, shareTo: number) {
-    await this.processRepository.save({
-      id: process.id,
-      userId: shareTo,
-      sharedByUserId: process.userId,
-      version: 0,
-      name: process.name,
-      description: process.description,
-    });
+    const processDetail = await this.processDetailModel.findById(`${process.userId}.${process.id}.${process.version}`);
 
-    const processDetail = await this.processDetailModel.findById(`${process.userId}.${process.id}`);
-    const newSharedProcessDetail = await new this.processDetailModel({
-      _id: `${shareTo}.${process.id}`,
+    this.createProcessAllParams({
+      id: process.id,
+      sharedByUserId: process.userId,
+      name: process.name,
+      description: "Shared from " + process.user.email,
       xml: processDetail.xml,
       variables: processDetail.variables,
       activities: processDetail.activities,
-    });
+    }, shareTo);
+    // const newSharedProcessDetail = await new this.processDetailModel({
+    //   _id: `${shareTo}.${process.id}.${process.version}`,
+    //   processId: process.id,
+    //   versionId: process.version,
+    //   xml: processDetail.xml,
+    //   variables: processDetail.variables,
+    //   activities: processDetail.activities,
+    // });
 
-    this.processBeforeShare(newSharedProcessDetail);
+    // this.processBeforeShare(newSharedProcessDetail);
 
-    await newSharedProcessDetail.save();
+    // await newSharedProcessDetail.save();
+    return "success"
   }
 
   processBeforeShare(processDetail: ProcessDetail) {
@@ -267,7 +274,7 @@ export class ProcessesService {
         variables: createProcessAllParams.variables,
         activities: createProcessAllParams.activities,
         tag: 'Initial Version',
-        description: 'The first version of the process',
+        description: createProcessAllParams.description || 'The first version of the process',
       });
     } catch (error) {
       await this.processRepository.delete({ id: processEntity.id, userId });
