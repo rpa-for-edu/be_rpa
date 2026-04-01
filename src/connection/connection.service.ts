@@ -63,7 +63,7 @@ export class ConnectionService {
         userId: createConnectionDto.fromUser,
         name: createConnectionDto.email ? createConnectionDto.email : Date.now().toString(),
         accessToken: createConnectionDto.accessToken,
-        refreshToken: createConnectionDto.refreshToken,
+        refreshToken: createConnectionDto.refreshToken || '',
         connectionKey: randomUUID(),
       });
       return connection;
@@ -79,7 +79,7 @@ export class ConnectionService {
       }
 
       connection.accessToken = createConnectionDto.accessToken;
-      connection.refreshToken = createConnectionDto.refreshToken;
+      connection.refreshToken = createConnectionDto.refreshToken || connection.refreshToken;
       await this.connectionRepository.save(connection);
       return connection;
     }

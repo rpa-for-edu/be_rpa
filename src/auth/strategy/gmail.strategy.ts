@@ -34,7 +34,7 @@ export class GmailStrategy extends PassportStrategy(Strategy, 'gmail') {
   ): void {
     const { fromUser, reconnect } = req.query;
     const state = fromUser ? JSON.stringify({ fromUser, reconnect }) : undefined;
-    super.authenticate(req, { ...options, state });
+    super.authenticate(req, { ...options, state, accessType: 'offline', prompt: 'consent' });
   }
 
   async validate(

@@ -37,7 +37,7 @@ export class GoogleClassroomStrategy extends PassportStrategy(Strategy, 'google-
   ): void {
     const { fromUser, reconnect } = req.query;
     const state = fromUser ? JSON.stringify({ fromUser, reconnect }) : undefined;
-    super.authenticate(req, { ...options, state });
+    super.authenticate(req, { ...options, state, accessType: 'offline', prompt: 'consent' });
   }
 
   async validate(

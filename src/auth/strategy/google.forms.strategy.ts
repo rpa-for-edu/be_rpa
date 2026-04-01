@@ -29,7 +29,7 @@ export class GoogleFormsStrategy extends PassportStrategy(Strategy, 'google-form
   authenticate(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, options?: any): void {
     const { fromUser, reconnect } = req.query;
     const state = fromUser? JSON.stringify({ fromUser, reconnect }): undefined;
-    super.authenticate(req, { ...options, state });
+    super.authenticate(req, { ...options, state, accessType: 'offline', prompt: 'consent' });
   }
 
   async validate(accessToken: string, refreshToken: string, profile: UserFromGoogle, done: VerifyCallback) {
