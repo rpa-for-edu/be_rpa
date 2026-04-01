@@ -29,11 +29,13 @@ export class Connection {
 
   @Column({
     nullable: false,
+    type: 'text',
   })
   accessToken: string;
 
   @Column({
     nullable: false,
+    type: 'text',
   })
   refreshToken: string;
 
