@@ -12,5 +12,6 @@ import { RobotReportRealtimeGateway } from './robot-report.gateway';
   imports: [TypeOrmModule.forFeature([RobotRunDetail, RobotRunLog, RobotRunOverall, Robot])],
   providers: [RobotReportService, RobotReportRealtimeGateway],
   controllers: [RobotReportController],
+  exports: [RobotReportService],
 })
 export class RobotReportModule {}

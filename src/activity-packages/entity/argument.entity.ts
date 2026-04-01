@@ -12,6 +12,9 @@ export class Argument {
   @Column({ nullable: true })
   description: string;
 
+  @Column({ name: 'description_vi', nullable: true })
+  descriptionVi: string;
+
   @Column()
   type: string; // VD: "string", "number", "boolean", "object", "array"
 

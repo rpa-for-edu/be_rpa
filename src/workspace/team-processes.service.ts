@@ -7,6 +7,7 @@ import { Process } from 'src/processes/entity/process.entity';
 import { ProcessDetail } from 'src/processes/schema/process.schema';
 import { ProcessVersion } from 'src/processes/entity/processVersions.entity';
 import { TeamPermissionService } from './team-permission.service';
+import { ProcessesService } from 'src/processes/processes.service';
 
 @Injectable()
 export class TeamProcessesService {
@@ -18,6 +19,8 @@ export class TeamProcessesService {
     @InjectModel(ProcessDetail.name)
     private processDetailModel: Model<ProcessDetail>,
     private teamPermissionService: TeamPermissionService,
+
+    private readonly processService: ProcessesService,
   ) {}
 
   /**
@@ -133,29 +136,36 @@ export class TeamProcessesService {
       version: 1,
     });
 
-    // Create process version
-    const processVersion = await this.processVersionRepository.save({
-      processId: savedProcess.id,
-      tag: 'v1',
-      description: 'Initial version',
-      createdBy: userId,
-      isCurrent: true,
-    });
+    // // Create process version
+    // const processVersion = await this.processVersionRepository.save({
+    //   processId: savedProcess.id,
+    //   tag: 'v1',
+    //   description: 'Initial version',
+    //   createdBy: userId,
+    //   isCurrent: true,
+    // });
 
-    // Save process details to MongoDB
-    const processDetail = new this.processDetailModel({
-      _id: `${userId}.${savedProcess.id}.1`,
-      processId: savedProcess.id,
-      versionId: processVersion.id,
-      xml: createDto.xml || '',
-      activities: createDto.activities || [],
-      variables: createDto.variables || {},
-    });
+    // // Save process details to MongoDB
+    // const processDetail = new this.processDetailModel({
+    //   _id: `${userId}.${savedProcess.id}.1`,
+    //   processId: savedProcess.id,
+    //   versionId: processVersion.id,
+    //   xml: createDto.xml || '',
+    //   activities: createDto.activities || [],
+    //   variables: createDto.variables || {},
+    // });
 
-    await processDetail.save();
+    // await processDetail.save();
 
     // Return only ProcessDetail like workspace
-    return processDetail.toObject();
+    return this.processService.createProcessVersion(userId, {
+      processId: savedProcess.id,
+      xml: createDto.xml,
+      variables: {},
+      activities: [],
+      tag: 'Initial Version',
+      description: 'The first version of the process',
+    });
   }
 
   /**

@@ -338,9 +338,7 @@ export class AuthController {
 
     const message = 'Authorized ERPNext successfully!';
     res.redirect(
-      `${this.configService.get('FRONTEND_URL')}/integration-service?provider=${
-        AuthorizationProvider.ERP_Next
-      }&message=${message}`,
+      `${this.configService.get('FRONTEND_URL')}/integration-service?&message=${message}`,
     );
   }
 

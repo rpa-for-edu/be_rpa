@@ -191,6 +191,399 @@ export class RobotReportService {
     return new TransactionsResponseDto({ labels, data, total });
   }
 
+  // ─── System-wide Dashboard Methods (Admin) ─────────────────────────────
+
+  async getSystemAllStatuses(): Promise<AllStatusesResponseDto> {
+    const robots = await this.robotRepository.find();
+
+    if (robots.length === 0) {
+      return new AllStatusesResponseDto({
+        running: 0, stopped: 0, terminating: 0, idle: 0,
+        robots: [], triggerTypeCounts: {},
+      });
+    }
+
+    const latestLogSubQuery = this.robotRunLogRepository
+      .createQueryBuilder('sub')
+      .select('sub.process_id_version', 'process_id_version')
+      .addSelect('MAX(sub.created_at)', 'max_date')
+      .groupBy('sub.process_id_version');
+
+    const latestStatuses: { process_id_version: string; instance_state: string }[] =
+      await this.robotRunLogRepository
+        .createQueryBuilder('rrl')
+        .select('rrl.process_id_version', 'process_id_version')
+        .addSelect('rrl.instance_state', 'instance_state')
+        .innerJoin(
+          `(${latestLogSubQuery.getQuery()})`,
+          'latest',
+          'rrl.process_id_version = latest.process_id_version AND rrl.created_at = latest.max_date',
+        )
+        .setParameters({ ...latestLogSubQuery.getParameters() })
+        .getRawMany();
+
+    const statusMap = new Map<string, string>();
+    for (const row of latestStatuses) {
+      statusMap.set(row.process_id_version, row.instance_state);
+    }
+
+    const RUNNING_STATES = new Set(['running', 'executing', 'pending', 'setup']);
+    const STOPPED_STATES = new Set(['stopping', 'stopped', 'cooldown']);
+    const TERMINATING_STATES = new Set(['terminating', 'shutting-down']);
+
+    const classifyStatus = (rawState: string | null): string => {
+      if (!rawState) return 'idle';
+      if (RUNNING_STATES.has(rawState)) return 'running';
+      if (STOPPED_STATES.has(rawState)) return 'stopped';
+      if (TERMINATING_STATES.has(rawState)) return 'terminating';
+      return 'idle';
+    };
+
+    const robotItems: RobotStatusItemDto[] = robots.map((robot) => {
+      const processIdVersion = `${robot.processId}.${robot.processVersion}`;
+      const rawState = statusMap.get(processIdVersion) ?? null;
+      return {
+        name: robot.name,
+        processId: robot.processId,
+        processVersion: robot.processVersion,
+        triggerType: robot.triggerType,
+        scope: robot.scope,
+        status: classifyStatus(rawState),
+      };
+    });
+
+    let running = 0, stopped = 0, terminating = 0, idle = 0;
+    for (const item of robotItems) {
+      if (item.status === 'running') running++;
+      else if (item.status === 'stopped') stopped++;
+      else if (item.status === 'terminating') terminating++;
+      else idle++;
+    }
+
+    const triggerTypeCounts: Record<string, number> = {};
+    for (const item of robotItems) {
+      triggerTypeCounts[item.triggerType] = (triggerTypeCounts[item.triggerType] || 0) + 1;
+    }
+
+    return new AllStatusesResponseDto({
+      running, stopped, terminating, idle,
+      robots: robotItems, triggerTypeCounts,
+    });
+  }
+
+  async getSystemDashboardJobsHistory(date?: string): Promise<JobsHistoryResponseDto> {
+    const queryBuilder = this.robotRunOverallRepository
+      .createQueryBuilder('rro')
+      .select(
+        `SUM(CASE WHEN rro.passed > 0 AND rro.failed = 0 THEN 1 ELSE 0 END)`,
+        'successful',
+      )
+      .addSelect(
+        `SUM(CASE WHEN rro.failed > 0 THEN 1 ELSE 0 END)`,
+        'faulted',
+      )
+      .addSelect(
+        `SUM(CASE WHEN rro.passed = 0 AND rro.failed = 0 THEN 1 ELSE 0 END)`,
+        'stopped',
+      )
+      .addSelect('COUNT(*)', 'total');
+
+    if (date) {
+      queryBuilder.andWhere('rro.created_date >= :date', { date });
+    }
+
+    const result = await queryBuilder.getRawOne();
+
+    return new JobsHistoryResponseDto({
+      successful: parseInt(result?.successful || '0', 10),
+      faulted: parseInt(result?.faulted || '0', 10),
+      stopped: parseInt(result?.stopped || '0', 10),
+      total: parseInt(result?.total || '0', 10),
+    });
+  }
+
+  async getSystemDashboardTransactions(
+    date?: string,
+    granularity?: string,
+  ): Promise<TransactionsResponseDto> {
+    const now = new Date();
+    const fromDate = date ? new Date(date) : null;
+    const diffMs = fromDate ? now.getTime() - fromDate.getTime() : null;
+    const ONE_HOUR = 60 * 60 * 1000;
+    const ONE_DAY = 24 * ONE_HOUR;
+
+    let dateFormat: string;
+    if (granularity === 'minute' || (diffMs !== null && diffMs <= ONE_HOUR && !granularity)) {
+      dateFormat = `'%H:%i'`;
+    } else if (granularity === 'hour' || (diffMs !== null && diffMs <= ONE_DAY && !granularity)) {
+      dateFormat = `'%H:00'`;
+    } else {
+      dateFormat = `'%Y-%m-%d'`;
+    }
+
+    const queryBuilder = this.robotRunOverallRepository
+      .createQueryBuilder('rro')
+      .select(`DATE_FORMAT(rro.start_time, ${dateFormat})`, 'label')
+      .addSelect('COUNT(*)', 'count');
+
+    if (date) {
+      queryBuilder.andWhere('rro.start_time >= :date', { date });
+    }
+
+    queryBuilder
+      .groupBy('label')
+      .orderBy('label', 'ASC');
+
+    const results: { label: string; count: string }[] = await queryBuilder.getRawMany();
+
+    const labels = results.map((r) => r.label);
+    const data = results.map((r) => parseInt(r.count, 10));
+    const total = data.reduce((sum, val) => sum + val, 0);
+
+    return new TransactionsResponseDto({ labels, data, total });
+  }
+
+  async getSystemRecentActivities() {
+    // Top 20 recent activities from robot_run_log
+    const logs = await this.robotRunLogRepository.find({
+      order: { createdDate: 'DESC' },
+      take: 20,
+    });
+
+    // If needed, map process_id_version to robot name or process name
+    const processIdVersions = [...new Set(logs.map(log => log.processIdVersion))];
+    
+    // Find robots that match these versions to grab a human readable name
+    // Since processIdVersion format is "processId.version"
+    const robots = await this.robotRepository.find();
+    const robotMap = new Map<string, string>();
+    for (const bot of robots) {
+      robotMap.set(`${bot.processId}.${bot.processVersion}`, bot.name);
+    }
+
+    return logs.map(log => ({
+      instanceId: log.instanceId,
+      processName: robotMap.get(log.processIdVersion) || log.processIdVersion,
+      processIdVersion: log.processIdVersion,
+      status: log.instanceState,
+      time: log.createdDate || log.launchTime,
+      userId: log.userId,
+    }));
+  }
+
+  // ─── Workspace Dashboard Methods ─────────────────────────────
+
+  async getWorkspaceAllStatuses(workspaceId: string): Promise<AllStatusesResponseDto> {
+    // Get all robots scoped to this workspace
+    const robots = await this.robotRepository.find({
+      where: { workspaceId },
+    });
+
+    if (robots.length === 0) {
+      return new AllStatusesResponseDto({
+        running: 0, stopped: 0, terminating: 0, idle: 0,
+        robots: [], triggerTypeCounts: {},
+      });
+    }
+
+    // Collect unique userIds from workspace robots for log lookup
+    const userIds = [...new Set(robots.map((r) => String(r.userId)))];
+
+    // Subquery: latest created_at per process_id_version across workspace users
+    const latestLogSubQuery = this.robotRunLogRepository
+      .createQueryBuilder('sub')
+      .select('sub.process_id_version', 'process_id_version')
+      .addSelect('MAX(sub.created_at)', 'max_date')
+      .where('sub.user_id IN (:...userIds)', { userIds })
+      .groupBy('sub.process_id_version');
+
+    // Get the latest status for each process_id_version
+    const latestStatuses: { process_id_version: string; instance_state: string }[] =
+      await this.robotRunLogRepository
+        .createQueryBuilder('rrl')
+        .select('rrl.process_id_version', 'process_id_version')
+        .addSelect('rrl.instance_state', 'instance_state')
+        .innerJoin(
+          `(${latestLogSubQuery.getQuery()})`,
+          'latest',
+          'rrl.process_id_version = latest.process_id_version AND rrl.created_at = latest.max_date',
+        )
+        .where('rrl.user_id IN (:...userIds)')
+        .setParameters({ ...latestLogSubQuery.getParameters(), userIds })
+        .getRawMany();
+
+    // Build a map: process_id_version -> instance_state
+    const statusMap = new Map<string, string>();
+    for (const row of latestStatuses) {
+      statusMap.set(row.process_id_version, row.instance_state);
+    }
+
+    const RUNNING_STATES = new Set(['running', 'executing', 'pending', 'setup']);
+    const STOPPED_STATES = new Set(['stopping', 'stopped', 'cooldown']);
+    const TERMINATING_STATES = new Set(['terminating', 'shutting-down']);
+
+    const classifyStatus = (rawState: string | null): string => {
+      if (!rawState) return 'idle';
+      if (RUNNING_STATES.has(rawState)) return 'running';
+      if (STOPPED_STATES.has(rawState)) return 'stopped';
+      if (TERMINATING_STATES.has(rawState)) return 'terminating';
+      return 'idle';
+    };
+
+    const robotItems: RobotStatusItemDto[] = robots.map((robot) => {
+      const processIdVersion = `${robot.processId}.${robot.processVersion}`;
+      const rawState = statusMap.get(processIdVersion) ?? null;
+      return {
+        name: robot.name,
+        processId: robot.processId,
+        processVersion: robot.processVersion,
+        triggerType: robot.triggerType,
+        scope: robot.scope,
+        status: classifyStatus(rawState),
+      };
+    });
+
+    let running = 0, stopped = 0, terminating = 0, idle = 0;
+    for (const item of robotItems) {
+      if (item.status === 'running') running++;
+      else if (item.status === 'stopped') stopped++;
+      else if (item.status === 'terminating') terminating++;
+      else idle++;
+    }
+
+    const triggerTypeCounts: Record<string, number> = {};
+    for (const item of robotItems) {
+      triggerTypeCounts[item.triggerType] = (triggerTypeCounts[item.triggerType] || 0) + 1;
+    }
+
+    return new AllStatusesResponseDto({
+      running, stopped, terminating, idle,
+      robots: robotItems, triggerTypeCounts,
+    });
+  }
+
+  async getWorkspaceDashboardJobsHistory(
+    workspaceId: string,
+    date?: string,
+  ): Promise<JobsHistoryResponseDto> {
+    // Get workspace robot identifiers
+    const robots = await this.robotRepository.find({
+      where: { workspaceId },
+      select: ['processId', 'processVersion', 'userId'],
+    });
+
+    if (robots.length === 0) {
+      return new JobsHistoryResponseDto({ successful: 0, faulted: 0, stopped: 0, total: 0 });
+    }
+
+    const queryBuilder = this.robotRunOverallRepository
+      .createQueryBuilder('rro')
+      .select(
+        `SUM(CASE WHEN rro.passed > 0 AND rro.failed = 0 THEN 1 ELSE 0 END)`,
+        'successful',
+      )
+      .addSelect(
+        `SUM(CASE WHEN rro.failed > 0 THEN 1 ELSE 0 END)`,
+        'faulted',
+      )
+      .addSelect(
+        `SUM(CASE WHEN rro.passed = 0 AND rro.failed = 0 THEN 1 ELSE 0 END)`,
+        'stopped',
+      )
+      .addSelect('COUNT(*)', 'total');
+
+    // Filter by workspace robots using (process_id, version, user_id) tuples
+    const conditions = robots.map((r, i) =>
+      `(rro.process_id = :pid${i} AND rro.version = :ver${i} AND rro.user_id = :uid${i})`,
+    );
+    const params: Record<string, any> = {};
+    robots.forEach((r, i) => {
+      params[`pid${i}`] = r.processId;
+      params[`ver${i}`] = r.processVersion;
+      params[`uid${i}`] = r.userId;
+    });
+
+    queryBuilder.where(`(${conditions.join(' OR ')})`, params);
+
+    if (date) {
+      queryBuilder.andWhere('rro.created_date >= :date', { date });
+    }
+
+    const result = await queryBuilder.getRawOne();
+
+    return new JobsHistoryResponseDto({
+      successful: parseInt(result.successful, 10),
+      faulted: parseInt(result.faulted, 10),
+      stopped: parseInt(result.stopped, 10),
+      total: parseInt(result.total, 10),
+    });
+  }
+
+  async getWorkspaceDashboardTransactions(
+    workspaceId: string,
+    date?: string,
+    granularity?: string,
+  ): Promise<TransactionsResponseDto> {
+    // Get workspace robot identifiers
+    const robots = await this.robotRepository.find({
+      where: { workspaceId },
+      select: ['processId', 'processVersion', 'userId'],
+    });
+
+    if (robots.length === 0) {
+      return new TransactionsResponseDto({ labels: [], data: [], total: 0 });
+    }
+
+    // Determine date format from explicit granularity
+    let dateFormat: string;
+    switch (granularity) {
+      case 'minute':
+        dateFormat = `'%H:%i'`;
+        break;
+      case 'day':
+        dateFormat = `'%Y-%m-%d'`;
+        break;
+      case 'hour':
+      default:
+        dateFormat = `'%H:00'`;
+        break;
+    }
+
+    const queryBuilder = this.robotRunOverallRepository
+      .createQueryBuilder('rro')
+      .select(`DATE_FORMAT(rro.start_time, ${dateFormat})`, 'label')
+      .addSelect('COUNT(*)', 'count');
+
+    // Filter by workspace robots
+    const conditions = robots.map((r, i) =>
+      `(rro.process_id = :pid${i} AND rro.version = :ver${i} AND rro.user_id = :uid${i})`,
+    );
+    const params: Record<string, any> = {};
+    robots.forEach((r, i) => {
+      params[`pid${i}`] = r.processId;
+      params[`ver${i}`] = r.processVersion;
+      params[`uid${i}`] = r.userId;
+    });
+
+    queryBuilder.where(`(${conditions.join(' OR ')})`, params);
+
+    if (date) {
+      queryBuilder.andWhere('rro.start_time >= :date', { date });
+    }
+
+    queryBuilder
+      .groupBy('label')
+      .orderBy('label', 'ASC');
+
+    const results: { label: string; count: string }[] = await queryBuilder.getRawMany();
+
+    const labels = results.map((r) => r.label);
+    const data = results.map((r) => parseInt(r.count, 10));
+    const total = data.reduce((sum, val) => sum + val, 0);
+
+    return new TransactionsResponseDto({ labels, data, total });
+  }
+
   async getRobotRunDetailCommands(
     uuid: string,
     userId: number,
