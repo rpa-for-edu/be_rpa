@@ -44,6 +44,7 @@ import { RobotConnection } from 'src/connection/entity/robot_connection.entity';
 import { UsersModule } from 'src/users/users.module';
 import { ConnectionModule } from 'src/connection/connection.module';
 import { GoogleModule } from 'src/google/google.module';
+import { ProcessesModule } from 'src/processes/processes.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { GoogleModule } from 'src/google/google.module';
     UsersModule,
     ConnectionModule,
     GoogleModule,
+    ProcessesModule,
   ],
   controllers: [
     WorkspaceController,

@@ -42,7 +42,7 @@ export class GoogleDriveStrategy extends PassportStrategy(Strategy, 'google-driv
       ? JSON.stringify({ fromUser, reconnect })
       : undefined;
     
-    super.authenticate(req, { ...options, state });
+    super.authenticate(req, { ...options, state, accessType: 'offline', prompt: 'consent' });
   }
 
   async validate(

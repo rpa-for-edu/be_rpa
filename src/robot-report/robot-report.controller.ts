@@ -1,9 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { RobotReportService } from './robot-report.service';
 import { UserDecor } from 'src/common/decorators/user.decorator';
 import { UserPayload } from 'src/auth/strategy/jwt.strategy';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { DashboardQueryDto } from './dto/dashboard-query.dto';
+import { WorkspaceDashboardQueryDto } from './dto/workspace-dashboard-query.dto';
 import { AllStatusesResponseDto } from './dto/all-statuses-response.dto';
 import { JobsHistoryResponseDto } from './dto/jobs-history-response.dto';
 import { TransactionsResponseDto } from './dto/transactions-response.dto';
@@ -14,7 +15,7 @@ import { TransactionsResponseDto } from './dto/transactions-response.dto';
 export class RobotReportController {
   constructor(private readonly robotRunDetailService: RobotReportService) {}
 
-  // ─── Dashboard Endpoints ──────────────────────────────────
+  // ─── Dashboard Endpoints (Personal) ──────────────────────────
 
   @Get('/dashboard/all-statuses')
   async getDashboardAllStatuses(
@@ -37,6 +38,35 @@ export class RobotReportController {
     @Query() query: DashboardQueryDto,
   ): Promise<TransactionsResponseDto> {
     return this.robotRunDetailService.getDashboardTransactions(user.id, query.date);
+  }
+
+  // ─── Dashboard Endpoints (Workspace) ─────────────────────────
+
+  @Get('/dashboard/:workspaceId/all-statuses')
+  async getWorkspaceDashboardAllStatuses(
+    @Param('workspaceId') workspaceId: string,
+  ): Promise<AllStatusesResponseDto> {
+    return this.robotRunDetailService.getWorkspaceAllStatuses(workspaceId);
+  }
+
+  @Get('/dashboard/:workspaceId/jobs-history')
+  async getWorkspaceDashboardJobsHistory(
+    @Param('workspaceId') workspaceId: string,
+    @Query() query: WorkspaceDashboardQueryDto,
+  ): Promise<JobsHistoryResponseDto> {
+    return this.robotRunDetailService.getWorkspaceDashboardJobsHistory(workspaceId, query.date);
+  }
+
+  @Get('/dashboard/:workspaceId/transactions')
+  async getWorkspaceDashboardTransactions(
+    @Param('workspaceId') workspaceId: string,
+    @Query() query: WorkspaceDashboardQueryDto,
+  ): Promise<TransactionsResponseDto> {
+    return this.robotRunDetailService.getWorkspaceDashboardTransactions(
+      workspaceId,
+      query.date,
+      query.granularity,
+    );
   }
 
   // ─── Existing Endpoints ──────────────────────────────────

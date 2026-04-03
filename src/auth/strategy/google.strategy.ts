@@ -27,7 +27,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ): void {
     const { redirectUrl } = req.query;
     const state = JSON.stringify({ redirectUrl });
-    super.authenticate(req, { ...options, state });
+    super.authenticate(req, { ...options, state, accessType: 'offline', prompt: 'consent' });
   }
 
   async validate(accessToken: string, refreshToken: string, profile: UserFromGoogle, done: VerifyCallback) {

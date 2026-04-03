@@ -19,6 +19,7 @@ import {
   UnableToCreateProcessException,
   UserNotFoundException,
 } from 'src/common/exceptions';
+import { ProcessesService } from 'src/processes/processes.service';
 
 @Injectable()
 export class WorkspaceProcessesService {
@@ -35,6 +36,7 @@ export class WorkspaceProcessesService {
     private processDetailModel: Model<ProcessDetail>,
     private readonly usersService: UsersService,
     private readonly notificationService: NotificationService,
+    private readonly processService: ProcessesService,
   ) {}
 
   /**
@@ -144,42 +146,50 @@ export class WorkspaceProcessesService {
       scope: ProcessScope.WORKSPACE,
     });
 
-    try {
-      // Create initial version
-      const processVersionEntity = await this.processVersionRepository.save({
-        processId: processEntity.id,
-        createdBy: userId,
-        tag: 'Initial Version',
-        vdescription: 'The first version of the process',
-        updatedAt: new Date(),
-        isCurrent: true,
-        creator: { id: userId },
-      });
+    // try {
+    //   // Create initial version
+    //   const processVersionEntity = await this.processVersionRepository.save({
+    //     processId: processEntity.id,
+    //     createdBy: userId,
+    //     tag: 'Initial Version',
+    //     vdescription: 'The first version of the process',
+    //     updatedAt: new Date(),
+    //     isCurrent: true,
+    //     creator: { id: userId },
+    //   });
 
-      // Create process detail in MongoDB
-      const processDetail = new this.processDetailModel({
-        _id: `${userId}.${processEntity.id}.1`,
-        processId: processEntity.id,
-        versionId: processVersionEntity.id,
-        xml: createProcessDto.xml,
-        variables: {},
-        activities: [],
-      });
+    //   // Create process detail in MongoDB
+    //   const processDetail = new this.processDetailModel({
+    //     _id: `${userId}.${processEntity.id}.1`,
+    //     processId: processEntity.id,
+    //     versionId: processVersionEntity.id,
+    //     xml: createProcessDto.xml,
+    //     variables: {},
+    //     activities: [],
+    //   });
 
-      await processDetail.save();
+    //   await processDetail.save();
 
-      // Update process version
-      await this.processRepository.update(
-        { id: processEntity.id, userId },
-        { version: 1, updatedAt: new Date() },
-      );
+    //   // Update process version
+    //   await this.processRepository.update(
+    //     { id: processEntity.id, userId },
+    //     { version: 1, updatedAt: new Date() },
+    //   );
 
-      return processEntity;
-    } catch (error) {
-      // Rollback on error
-      await this.processRepository.delete({ id: processEntity.id, userId });
-      throw new UnableToCreateProcessException();
-    }
+    //   return processEntity;
+    // } catch (error) {
+    //   // Rollback on error
+    //   await this.processRepository.delete({ id: processEntity.id, userId });
+    //   throw new UnableToCreateProcessException();
+    // }
+    return this.processService.createProcessVersion(userId, {
+      processId: processEntity.id,
+      xml: createProcessDto.xml,
+      variables: {},
+      activities: [],
+      tag: 'Initial Version',
+      description: 'The first version of the process',
+    });
   }
 
   /**

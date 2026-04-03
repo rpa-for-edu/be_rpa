@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, InternalServerErrorException } from '@n
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Model } from 'mongoose';
-import { Process } from 'src/processes/entity/process.entity';
+import { Process, ProcessScope } from 'src/processes/entity/process.entity';
 import { ProcessDetail, ProcessForValidation } from 'src/processes/schema/process.schema';
 import { DataSource, Repository } from 'typeorm';
 import { ProcessesValidateService } from './processes-validate.service';
@@ -69,6 +69,7 @@ export class ProcessesService {
     const processEntity = await this.processRepository.save({
       ...createProcessDto,
       userId,
+      scope: ProcessScope.PERSONAL,
     });
     try {
       await this.createProcessVersion(userId, {

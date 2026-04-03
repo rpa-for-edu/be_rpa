@@ -21,8 +21,14 @@ export class ActivityTemplate {
   @Column()
   name: string;
 
+  @Column({ name: 'name_vi', nullable: true })
+  nameVi: string;
+
   @Column({ nullable: true })
   description: string;
+
+  @Column({ name: 'description_vi', nullable: true })
+  descriptionVi: string;
 
   @Column()
   keyword: string; // VD: "open_browser", "upload_file_to_drive"
