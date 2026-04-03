@@ -13,13 +13,13 @@ export class CreateRoleDto {
   description?: string;
 
   @IsArray()
-  @IsUUID('4', { each: true })
+  @IsUUID('all', { each: true })
   @ApiProperty({ type: [String], example: ['uuid-1', 'uuid-2'], description: 'Permission IDs' })
   permissionIds: string[];
 
   @IsOptional()
   @IsArray()
-  @IsUUID('4', { each: true })
+  @IsUUID('all', { each: true })
   @ApiPropertyOptional({
     type: [String],
     example: ['uuid-3', 'uuid-4'],
