@@ -479,7 +479,7 @@ export class ProcessesService {
   //! ===== COMMENTS =====!//
   async addCommentToElement(userId: number, addCommentToElementDto: AddCommentToElementDto) {
     const process = await this.processRepository.findOne({
-      where: { id: addCommentToElementDto.processId, userId },
+      where: { id: addCommentToElementDto.processId },
     });
     if (!process) {
       throw new ProcessNotFoundException();
@@ -501,7 +501,7 @@ export class ProcessesService {
 
   async getCommentsOfProcess(userId: number, processId: string) {
     const process = await this.processRepository.findOne({
-      where: { id: processId, userId },
+      where: { id: processId },
     });
 
     if (!process) {
