@@ -17,13 +17,13 @@ jobs:
       - name: SSH and Run Migration
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.AZURE_HOST }}
-          username: ${{ secrets.AZURE_USER }}
-          key: ${{ secrets.AZURE_SSH_KEY }}
-          port: ${{ secrets.AZURE_SSH_PORT || 22 }}
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USER }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          port: ${{ secrets.GCP_SSH_PORT || 22 }}
           script: |
             echo "Running Database Migration..."
-            cd /home/${{ secrets.AZURE_USER }}/be_rpa_app
+            cd /home/${{ secrets.GCP_USER }}/be_rpa_app
             
             # Run migration in a temporary container
             docker compose run --rm app npx typeorm migration:run -d dist/config/mysql.datasource.js

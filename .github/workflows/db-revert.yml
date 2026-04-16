@@ -17,13 +17,13 @@ jobs:
       - name: SSH and Run Revert
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.AZURE_HOST }}
-          username: ${{ secrets.AZURE_USER }}
-          key: ${{ secrets.AZURE_SSH_KEY }}
-          port: ${{ secrets.AZURE_SSH_PORT || 22 }}
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USER }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          port: ${{ secrets.GCP_SSH_PORT || 22 }}
           script: |
             echo "Reverting Last Migration..."
-            cd /home/${{ secrets.AZURE_USER }}/be_rpa_app
+            cd /home/${{ secrets.GCP_USER }}/be_rpa_app
             
             # Run revert inside the container using compiled code
             docker compose exec -T app node node_modules/typeorm/cli.js migration:revert -d dist/config/mysql.datasource.js
