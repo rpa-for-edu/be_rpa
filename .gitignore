@@ -36,3 +36,7 @@ lerna-debug.log*
 
 # environment
 env/
+
+# backup
+backup_core.sql
+backup_report.sql
