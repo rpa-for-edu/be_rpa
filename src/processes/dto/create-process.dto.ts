@@ -15,4 +15,8 @@ export class CreateProcessDto {
   @IsString()
   @IsNotEmpty()
   xml: string;
+
+  @IsString()
+  @IsNotEmpty()
+  parentId: string;
 }

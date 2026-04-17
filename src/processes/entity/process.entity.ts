@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entity/user.entity';
 import { Workspace } from '../../workspace/entity/workspace.entity';
@@ -88,4 +89,19 @@ export class Process {
 
   @Column({ nullable: true })
   status: string;
+
+  @Column({ nullable: true })
+  parentId: string;
+
+  @ManyToOne(() => Process, (process) => process.children, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn([
+    { name: 'parentId', referencedColumnName: 'id' },
+  ])
+  parent: Process;
+
+  @OneToMany(() => Process, (process) => process.parent)
+  children: Process[];
 }
