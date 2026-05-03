@@ -45,7 +45,7 @@ export class RobotRunLog {
 
   @CreateDateColumn({
     type: 'timestamp',
-    name: 'created_at',
+    name: 'created_date',
   })
   createdDate: Date;
 }
