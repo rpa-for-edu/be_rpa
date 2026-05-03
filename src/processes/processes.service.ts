@@ -56,9 +56,11 @@ export class ProcessesService {
     return this.processRepository
       .createQueryBuilder('process')
       .leftJoinAndSelect('process.sharedByUser', 'user', 'user.id = process.sharedByUserId')
+      .leftJoinAndSelect('process.children', 'children')
       .where('process.userId = :userId', { userId })
       .andWhere('process.workspaceId IS NULL')
       .andWhere('process.teamId IS NULL')
+      .andWhere('process.parentId IS NULL')
       .orderBy('process.updatedAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
@@ -70,6 +72,7 @@ export class ProcessesService {
       ...createProcessDto,
       userId,
       scope: ProcessScope.PERSONAL,
+      parentId: createProcessDto.parentId || null,
     });
     try {
       await this.createProcessVersion(userId, {
@@ -479,7 +482,7 @@ export class ProcessesService {
   //! ===== COMMENTS =====!//
   async addCommentToElement(userId: number, addCommentToElementDto: AddCommentToElementDto) {
     const process = await this.processRepository.findOne({
-      where: { id: addCommentToElementDto.processId, userId },
+      where: { id: addCommentToElementDto.processId },
     });
     if (!process) {
       throw new ProcessNotFoundException();
@@ -501,7 +504,7 @@ export class ProcessesService {
 
   async getCommentsOfProcess(userId: number, processId: string) {
     const process = await this.processRepository.findOne({
-      where: { id: processId, userId },
+      where: { id: processId },
     });
 
     if (!process) {
