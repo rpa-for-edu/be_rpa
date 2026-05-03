@@ -19,12 +19,16 @@ export class ErpNextOAuthStrategy extends PassportStrategy(Strategy, 'erpnext-oa
       const ERP_REDIRECT_URI = this.config.get<string>('ERP_REDIRECT_URI');
 
       const { fromUser, code } = req.query;
-      const state = encodeURIComponent(
-        JSON.stringify({
-          fromUser: fromUser as string,
-          reconnect: false,
-        }),
-      );
+      const { workspaceId } = req.params;
+      console.log('workspaceId: ',workspaceId)
+      const stateObj: any = {
+        fromUser: fromUser as string,
+        reconnect: false,
+      };
+      if (workspaceId) {
+        stateObj.workspaceId = workspaceId;
+      }
+      const state = encodeURIComponent(JSON.stringify(stateObj));
 
       // Nếu chưa có code → redirect tới ERPNext authorize
       if (!code) {

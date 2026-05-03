@@ -91,7 +91,7 @@ export class WorkspaceConnectionsService {
     const connection = this.workspaceConnectionRepository.create({
       workspaceId,
       provider: createDto.provider,
-      name: createDto.name,
+      name: createDto.provider,
       accessToken: createDto.accessToken,
       refreshToken: createDto.refreshToken,
       connectionKey,

@@ -59,13 +59,37 @@ export class PythonParserService {
             let docstring = '';
             let k = j + 1;
             if (k < lines.length && lines[k].trim().startsWith('"""')) {
-              const docLines = [];
-              k++;
-              while (k < lines.length && !lines[k].trim().endsWith('"""')) {
-                docLines.push(lines[k].trim());
+              const firstDocLine = lines[k].trim();
+              // Case 1: Single-line docstring
+              if (firstDocLine.length >= 6 && firstDocLine.endsWith('"""') && firstDocLine !== '"""') {
+                docstring = firstDocLine.slice(3, -3).trim();
                 k++;
               }
-              docstring = docLines.join('\n').trim();
+              // Case 2: Multi-line docstring — opening """ alone on its own line
+              else if (firstDocLine === '"""') {
+                k++;
+                const docLines = [];
+                while (k < lines.length && !lines[k].trim().endsWith('"""')) {
+                  docLines.push(lines[k].trim());
+                  k++;
+                }
+                docstring = docLines.join('\n').trim();
+                k++;
+              }
+              // Case 3: Multi-line — """First line... (continues)
+              else {
+                const docLines = [firstDocLine.slice(3).trim()];
+                k++;
+                while (k < lines.length && !lines[k].trim().endsWith('"""')) {
+                  docLines.push(lines[k].trim());
+                  k++;
+                }
+                if (k < lines.length) {
+                  docLines.push(lines[k].trim().slice(0, -3).trim());
+                  k++;
+                }
+                docstring = docLines.join('\n').trim();
+              }
             }
 
             keywords.push({
@@ -104,14 +128,37 @@ export class PythonParserService {
 
           // Extract docstring
           if (j < lines.length && lines[j].trim().startsWith('"""')) {
-            const docLines = [];
-            j++;
-            while (j < lines.length && !lines[j].trim().endsWith('"""')) {
-              docLines.push(lines[j].trim());
+            const firstDocLine = lines[j].trim();
+            // Case 1: Single-line docstring
+            if (firstDocLine.length >= 6 && firstDocLine.endsWith('"""') && firstDocLine !== '"""') {
+              docstring = firstDocLine.slice(3, -3).trim();
               j++;
             }
-            docstring = docLines.join('\n').trim();
-            j++;
+            // Case 2: Multi-line docstring — opening """ alone on its own line
+            else if (firstDocLine === '"""') {
+              j++;
+              const docLines = [];
+              while (j < lines.length && !lines[j].trim().endsWith('"""')) {
+                docLines.push(lines[j].trim());
+                j++;
+              }
+              docstring = docLines.join('\n').trim();
+              j++;
+            }
+            // Case 3: Multi-line — """First line... (continues)
+            else {
+              const docLines = [firstDocLine.slice(3).trim()];
+              j++;
+              while (j < lines.length && !lines[j].trim().endsWith('"""')) {
+                docLines.push(lines[j].trim());
+                j++;
+              }
+              if (j < lines.length) {
+                docLines.push(lines[j].trim().slice(0, -3).trim());
+                j++;
+              }
+              docstring = docLines.join('\n').trim();
+            }
           }
 
           // Find methods

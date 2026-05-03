@@ -1,0 +1,126 @@
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class AddParentIdToProcess1777819583871 implements MigrationInterface {
+    name = 'AddParentIdToProcess1777819583871'
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP FOREIGN KEY \`fk_packages_created_by\``);
+        await queryRunner.query(`ALTER TABLE \`team_invitation\` DROP FOREIGN KEY \`FK_894f909ae24db72b4faa399ca40\``);
+        await queryRunner.query(`ALTER TABLE \`process\` DROP FOREIGN KEY \`FK_process_parent_self\``);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` DROP FOREIGN KEY \`FK_workspace_connection_workspace\``);
+        await queryRunner.query(`DROP INDEX \`idx_packages_library_s3_key\` ON \`activity_package\``);
+        await queryRunner.query(`DROP INDEX \`idx_packages_parse_status\` ON \`activity_package\``);
+        await queryRunner.query(`DROP INDEX \`idx_templates_auto_generated\` ON \`activity_template\``);
+        await queryRunner.query(`DROP INDEX \`idx_templates_keyword\` ON \`activity_template\``);
+        await queryRunner.query(`DROP INDEX \`IDX_process_parentId\` ON \`process\``);
+        await queryRunner.query(`DROP INDEX \`idx_user_role\` ON \`user\``);
+        await queryRunner.query(`DROP INDEX \`FK_349827f8a131dd7481d473b2b22\` ON \`robot\``);
+        await queryRunner.query(`DROP INDEX \`FK_ab1b70b510664a47f15875f267a\` ON \`robot\``);
+        await queryRunner.query(`DROP INDEX \`IDX_robot_key\` ON \`robot\``);
+        await queryRunner.query(`DROP INDEX \`IDX_workspace_connection_key\` ON \`workspace_connection\``);
+        await queryRunner.query(`ALTER TABLE \`report\`.\`robot_run_log\` CHANGE \`created_date\` \`created_at\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`library_file_type\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`library_file_type\` varchar(255) NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`library_s3_key\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`library_s3_key\` varchar(255) NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`library_checksum\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`library_checksum\` varchar(255) NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`library_version\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`library_version\` varchar(255) NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`created_at\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`created_at\` datetime(6) NULL DEFAULT CURRENT_TIMESTAMP(6)`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`updated_at\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`updated_at\` datetime(6) NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)`);
+        await queryRunner.query(`ALTER TABLE \`argument\` DROP COLUMN \`defaultValue\``);
+        await queryRunner.query(`ALTER TABLE \`argument\` ADD \`defaultValue\` text NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` CHANGE \`is_auto_generated\` \`is_auto_generated\` tinyint NOT NULL DEFAULT 0`);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` DROP COLUMN \`type\``);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` ADD \`type\` varchar(255) NULL DEFAULT 'activity'`);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` DROP COLUMN \`icon_code\``);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` ADD \`icon_code\` varchar(255) NULL`);
+        await queryRunner.query(`ALTER TABLE \`comments\` DROP FOREIGN KEY \`FK_7a7c76f385f02734d7f1f9411e3\``);
+        await queryRunner.query(`ALTER TABLE \`comments\` DROP COLUMN \`process_id\``);
+        await queryRunner.query(`ALTER TABLE \`comments\` ADD \`process_id\` int NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`process\` DROP COLUMN \`status\``);
+        await queryRunner.query(`ALTER TABLE \`process\` ADD \`status\` varchar(255) NULL`);
+        await queryRunner.query(`ALTER TABLE \`notification\` CHANGE \`type\` \`type\` enum ('ROBOT_TRIGGER', 'ROBOT_EXECUTION', 'PROCESS_SHARED', 'CONNECTION_CHECK', 'TEAM_INVITATION', 'WORKSPACE_INVITATION') NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` DROP COLUMN \`accessToken\``);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` ADD \`accessToken\` varchar(255) NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` DROP COLUMN \`refreshToken\``);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` ADD \`refreshToken\` varchar(255) NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` CHANGE \`connection_key\` \`connection_key\` varchar(255) NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` ADD UNIQUE INDEX \`IDX_fdb704ea6b1c2501720c332416\` (\`connection_key\`)`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD CONSTRAINT \`FK_a51c9741dd30bf57210dc9976a3\` FOREIGN KEY (\`created_by\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`team_invitation\` ADD CONSTRAINT \`FK_894f909ae24db72b4faa399ca40\` FOREIGN KEY (\`roleId\`) REFERENCES \`role\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`comments\` ADD CONSTRAINT \`FK_7a7c76f385f02734d7f1f9411e3\` FOREIGN KEY (\`process_id\`, \`process_id\`) REFERENCES \`process\`(\`id\`,\`userId\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`process\` ADD CONSTRAINT \`FK_cbcab2379615b228789118ff8c2\` FOREIGN KEY (\`parentId\`) REFERENCES \`process\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`robot\` ADD CONSTRAINT \`FK_349827f8a131dd7481d473b2b22\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`robot\` ADD CONSTRAINT \`FK_ab1b70b510664a47f15875f267a\` FOREIGN KEY (\`processId\`, \`processUserId\`) REFERENCES \`process\`(\`id\`,\`userId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` ADD CONSTRAINT \`FK_a9d92a27885802a9b4674fe0443\` FOREIGN KEY (\`workspaceId\`) REFERENCES \`workspace\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`role_permission\` ADD CONSTRAINT \`FK_e3130a39c1e4a740d044e685730\` FOREIGN KEY (\`roleId\`) REFERENCES \`role\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
+        await queryRunner.query(`ALTER TABLE \`role_permission\` ADD CONSTRAINT \`FK_72e80be86cab0e93e67ed1a7a9a\` FOREIGN KEY (\`permissionId\`) REFERENCES \`permission\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`role_activity_template\` ADD CONSTRAINT \`FK_012a70c3694aae31a22d5f0667d\` FOREIGN KEY (\`roleId\`) REFERENCES \`role\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
+        await queryRunner.query(`ALTER TABLE \`role_activity_template\` ADD CONSTRAINT \`FK_c2e9c73a66157298b8b4a17cb8d\` FOREIGN KEY (\`activityTemplateId\`) REFERENCES \`activity_template\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE \`role_activity_template\` DROP FOREIGN KEY \`FK_c2e9c73a66157298b8b4a17cb8d\``);
+        await queryRunner.query(`ALTER TABLE \`role_activity_template\` DROP FOREIGN KEY \`FK_012a70c3694aae31a22d5f0667d\``);
+        await queryRunner.query(`ALTER TABLE \`role_permission\` DROP FOREIGN KEY \`FK_72e80be86cab0e93e67ed1a7a9a\``);
+        await queryRunner.query(`ALTER TABLE \`role_permission\` DROP FOREIGN KEY \`FK_e3130a39c1e4a740d044e685730\``);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` DROP FOREIGN KEY \`FK_a9d92a27885802a9b4674fe0443\``);
+        await queryRunner.query(`ALTER TABLE \`robot\` DROP FOREIGN KEY \`FK_ab1b70b510664a47f15875f267a\``);
+        await queryRunner.query(`ALTER TABLE \`robot\` DROP FOREIGN KEY \`FK_349827f8a131dd7481d473b2b22\``);
+        await queryRunner.query(`ALTER TABLE \`process\` DROP FOREIGN KEY \`FK_cbcab2379615b228789118ff8c2\``);
+        await queryRunner.query(`ALTER TABLE \`comments\` DROP FOREIGN KEY \`FK_7a7c76f385f02734d7f1f9411e3\``);
+        await queryRunner.query(`ALTER TABLE \`team_invitation\` DROP FOREIGN KEY \`FK_894f909ae24db72b4faa399ca40\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP FOREIGN KEY \`FK_a51c9741dd30bf57210dc9976a3\``);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` DROP INDEX \`IDX_fdb704ea6b1c2501720c332416\``);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` CHANGE \`connection_key\` \`connection_key\` varchar(255) COLLATE "utf8mb4_0900_ai_ci" NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` DROP COLUMN \`refreshToken\``);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` ADD \`refreshToken\` text COLLATE "utf8mb4_0900_ai_ci" NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` DROP COLUMN \`accessToken\``);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` ADD \`accessToken\` text COLLATE "utf8mb4_0900_ai_ci" NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`notification\` CHANGE \`type\` \`type\` enum COLLATE "utf8mb4_0900_ai_ci" ('ROBOT_TRIGGER', 'ROBOT_EXECUTION', 'PROCESS_SHARED', 'CONNECTION_CHECK', 'TEAM_INVITATION', 'WORKSPACE_INVITATION') NULL`);
+        await queryRunner.query(`ALTER TABLE \`process\` DROP COLUMN \`status\``);
+        await queryRunner.query(`ALTER TABLE \`process\` ADD \`status\` varchar(50) COLLATE "utf8mb4_0900_ai_ci" NOT NULL DEFAULT 'Draft'`);
+        await queryRunner.query(`ALTER TABLE \`comments\` DROP COLUMN \`process_id\``);
+        await queryRunner.query(`ALTER TABLE \`comments\` ADD \`process_id\` varchar(255) COLLATE "utf8mb4_0900_ai_ci" NOT NULL`);
+        await queryRunner.query(`ALTER TABLE \`comments\` ADD CONSTRAINT \`FK_7a7c76f385f02734d7f1f9411e3\` FOREIGN KEY (\`process_id\`) REFERENCES \`process\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` DROP COLUMN \`icon_code\``);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` ADD \`icon_code\` varchar(50) COLLATE "utf8mb4_0900_ai_ci" NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` DROP COLUMN \`type\``);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` ADD \`type\` varchar(50) COLLATE "utf8mb4_0900_ai_ci" NULL DEFAULT 'activity'`);
+        await queryRunner.query(`ALTER TABLE \`activity_template\` CHANGE \`is_auto_generated\` \`is_auto_generated\` tinyint(1) NOT NULL DEFAULT '0'`);
+        await queryRunner.query(`ALTER TABLE \`argument\` DROP COLUMN \`defaultValue\``);
+        await queryRunner.query(`ALTER TABLE \`argument\` ADD \`defaultValue\` json NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`updated_at\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`updated_at\` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`created_at\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`created_at\` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`library_version\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`library_version\` varchar(50) COLLATE "utf8mb4_0900_ai_ci" NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`library_checksum\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`library_checksum\` varchar(64) COLLATE "utf8mb4_0900_ai_ci" NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`library_s3_key\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`library_s3_key\` varchar(500) COLLATE "utf8mb4_0900_ai_ci" NULL`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` DROP COLUMN \`library_file_type\``);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD \`library_file_type\` varchar(10) COLLATE "utf8mb4_0900_ai_ci" NULL`);
+        await queryRunner.query(`ALTER TABLE \`report\`.\`robot_run_log\` CHANGE \`created_at\` \`created_date\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)`);
+        await queryRunner.query(`CREATE UNIQUE INDEX \`IDX_workspace_connection_key\` ON \`workspace_connection\` (\`connection_key\`)`);
+        await queryRunner.query(`CREATE INDEX \`IDX_robot_key\` ON \`robot\` (\`robot_key\`)`);
+        await queryRunner.query(`CREATE INDEX \`FK_ab1b70b510664a47f15875f267a\` ON \`robot\` (\`processId\`, \`processUserId\`)`);
+        await queryRunner.query(`CREATE INDEX \`FK_349827f8a131dd7481d473b2b22\` ON \`robot\` (\`userId\`)`);
+        await queryRunner.query(`CREATE INDEX \`idx_user_role\` ON \`user\` (\`role\`)`);
+        await queryRunner.query(`CREATE INDEX \`IDX_process_parentId\` ON \`process\` (\`parentId\`)`);
+        await queryRunner.query(`CREATE INDEX \`idx_templates_keyword\` ON \`activity_template\` (\`keyword_name\`)`);
+        await queryRunner.query(`CREATE INDEX \`idx_templates_auto_generated\` ON \`activity_template\` (\`is_auto_generated\`)`);
+        await queryRunner.query(`CREATE INDEX \`idx_packages_parse_status\` ON \`activity_package\` (\`parse_status\`)`);
+        await queryRunner.query(`CREATE INDEX \`idx_packages_library_s3_key\` ON \`activity_package\` (\`library_s3_key\`)`);
+        await queryRunner.query(`ALTER TABLE \`workspace_connection\` ADD CONSTRAINT \`FK_workspace_connection_workspace\` FOREIGN KEY (\`workspaceId\`) REFERENCES \`workspace\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`process\` ADD CONSTRAINT \`FK_process_parent_self\` FOREIGN KEY (\`parentId\`) REFERENCES \`process\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`team_invitation\` ADD CONSTRAINT \`FK_894f909ae24db72b4faa399ca40\` FOREIGN KEY (\`roleId\`) REFERENCES \`role\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`activity_package\` ADD CONSTRAINT \`fk_packages_created_by\` FOREIGN KEY (\`created_by\`) REFERENCES \`user\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
+    }
+
+}

@@ -330,6 +330,32 @@ export class AuthController {
   ) {
     const decodedState = state ? decodeURIComponent(state) : '';
     console.log('ERPNext OAuth2 state:', decodedState);
+
+    let isWorkspace = false;
+    let workspaceId = '';
+    try {
+      const stateObj = JSON.parse(decodedState);
+      if (stateObj.workspaceId) {
+        isWorkspace = true;
+        workspaceId = stateObj.workspaceId;
+      }
+    } catch (e) {}
+
+    if (isWorkspace) {
+      await this.authService.authorizeWorkspaceFromProvider(
+        user,
+        decodedState,
+        AuthorizationProvider.ERP_Next,
+      );
+      const message = 'Authorized ERPNext successfully!';
+      res.redirect(
+        `${this.configService.get('FRONTEND_URL')}/workspace/${workspaceId}/integration-service?provider=${
+          AuthorizationProvider.ERP_Next
+        }&message=${message}`,
+      );
+      return;
+    }
+
     await this.authService.authorizeUserFromProvider(
       user,
       decodedState,
@@ -343,6 +369,10 @@ export class AuthController {
   }
 
   // ==================== WORKSPACE OAUTH ENDPOINTS ====================
+
+  @Get('workspace/:workspaceId/erpnext')
+  @UseGuards(ErpNextOAuthGuard)
+  async workspaceErpNextAuth() {}
 
   @Get('workspace/:workspaceId/drive')
   @UseGuards(GoogleDriveOauthGuard)
