@@ -47,12 +47,17 @@ export class PythonParserService {
         }
 
         if (j < lines.length) {
-          const methodLine = lines[j].trim();
-          const methodMatch = methodLine.match(/def\s+(\w+)\s*\((.*?)\)/);
+          // Join lines until closing ')' to handle multi-line signatures
+          let methodLine = lines[j].trim();
+          while (j < lines.length && !methodLine.includes(')')) {
+            j++;
+            methodLine += ' ' + lines[j].trim();
+          }
+          const methodMatch = methodLine.match(/def\s+(\w+)\s*\(([\s\S]*?)\)/);
           
           if (methodMatch) {
             const methodName = methodMatch[1];
-            const argsString = methodMatch[2];
+            const argsString = methodMatch[2].replace(/\s+/g, ' ').trim();
             const args = this.parseMethodArgs(argsString);
 
             // Extract docstring

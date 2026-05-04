@@ -12,6 +12,7 @@ import axios from 'axios';
 import { GoogleService } from 'src/google/google.service';
 import { randomUUID } from 'crypto';
 import { Robot } from 'src/robot/entity/robot.entity';
+import { WorkspaceConnection } from 'src/workspace/entity/workspace-connection.entity';
 import { GoogleCredentialService } from './service/google-credential.service';
 import { MoodleService } from './service/moodle.service';
 import { CreateMoodleConnectionDto } from './dto/create-moodle-connection.dto';
@@ -45,6 +46,8 @@ export class ConnectionService {
     private robotConnectionRepository: Repository<RobotConnection>,
     @InjectRepository(Robot)
     private robotRepository: Repository<Robot>,
+    @InjectRepository(WorkspaceConnection)
+    private workspaceConnectionRepository: Repository<WorkspaceConnection>,
     readonly configService: ConfigService,
     private googleService: GoogleService,
     private googleCredentialService: GoogleCredentialService,
@@ -271,34 +274,37 @@ export class ConnectionService {
     });
     let robotKey = robot.robotKey;
     let robotConnectionsMapping = await this.robotConnectionRepository.find({
-      select: [],
       where: {
         robotKey: robotKey,
       },
-      relations: ['connection'],
     });
-    let connections = robotConnectionsMapping.map((conn) => {
+    
+    // Extract keys and fetch connection details for both User and Workspace connections
+    const connectionKeys = robotConnectionsMapping.map((conn) => conn.connectionKey);
+    const { connections: fetchedConnections } = await this.getConnectionByConnectionKey(connectionKeys);
+
+    let connections = fetchedConnections.map((connection) => {
       let credentialData;
 
       // Special handling for Moodle and ERPNext
       if (
-        conn.connection.provider === AuthorizationProvider.MOODLE ||
-        conn.connection.provider === AuthorizationProvider.ERP_Next
+        connection.provider === AuthorizationProvider.MOODLE ||
+        connection.provider === AuthorizationProvider.ERP_Next
       ) {
         credentialData = {
-          access_token: conn.connection.accessToken, // baseUrl
-          refresh_token: conn.connection.refreshToken, // Moodle/ERPNext token
-          ...(conn.connection.provider === AuthorizationProvider.ERP_Next
+          access_token: connection.accessToken, // baseUrl
+          refresh_token: connection.refreshToken, // Moodle/ERPNext token
+          ...(connection.provider === AuthorizationProvider.ERP_Next
             ? { base_url: this.configService.get('ERP_BASE_URL') }
             : {}),
         };
       } else {
         // All other providers use GoogleCredentialService
-        credentialData = this.googleCredentialService.create(conn.connection);
+        credentialData = this.googleCredentialService.create(connection as any);
       }
 
       return {
-        fileName: ConnectionService.getCredentialFileName(conn.connectionKey),
+        fileName: ConnectionService.getCredentialFileName(connection.connectionKey),
         data: credentialData,
       };
     });
@@ -327,7 +333,7 @@ export class ConnectionService {
         };
       } else {
         // All other providers use GoogleCredentialService
-        credentialData = this.googleCredentialService.create(connection);
+        credentialData = this.googleCredentialService.create(connection as any);
       }
       result.push({
         fileName: ConnectionService.getCredentialFileName(connection.connectionKey),
@@ -417,15 +423,24 @@ export class ConnectionService {
         connections: [],
       };
     }
-    // Use TypeORM's query builder to build a query
-    const query = this.connectionRepository
+    // Use TypeORM's query builder to build a query for regular connections
+    const regularQuery = this.connectionRepository
       .createQueryBuilder('connection')
       .where('connection.connectionKey IN (:...connectionKeys)', { connectionKeys });
 
-    // Execute the query and return the result
-    const result = await query.getMany();
+    // Use TypeORM's query builder to build a query for workspace connections
+    const workspaceQuery = this.workspaceConnectionRepository
+      .createQueryBuilder('workspaceConnection')
+      .where('workspaceConnection.connectionKey IN (:...connectionKeys)', { connectionKeys });
+
+    // Execute the queries and return the results
+    const [regularConnections, workspaceConnections] = await Promise.all([
+      regularQuery.getMany(),
+      workspaceQuery.getMany()
+    ]);
+
     return {
-      connections: result,
+      connections: [...regularConnections, ...workspaceConnections],
     };
   }
 
