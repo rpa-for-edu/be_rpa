@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmpty, IsOptional } from 'class-validator';
 
 export class CreateProcessDto {
   @IsString()
@@ -17,6 +17,6 @@ export class CreateProcessDto {
   xml: string;
 
   @IsString()
-  @IsNotEmpty()
-  parentId: string;
+  @IsOptional()
+  parentId?: string;
 }
